@@ -1,7 +1,7 @@
 @extends('frontend.master')
-@section('content')
+
 @section('title')
-    @if (session()->get('lang') == 'ru')
+    @if(session()->get('lang') == 'ru')
         {{ $submenu->title_ru }}
     @elseif(session()->get('lang') == 'en')
         {{ $submenu->title_en }}
@@ -10,141 +10,97 @@
     @endif
 @endsection
 
+@push('styles')
+    <style>
+        .page-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+        }
 
+        .page-content p {
+            margin-bottom: 1.2rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
 
+        .page-content h2,
+        .page-content h3,
+        .page-content h4 {
+            color: var(--text-primary);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-family: 'Playfair Display', serif;
+        }
 
-<!-- Banner Start -->
-<section class="custom-banner">
-    <div class="container">
-        <div class="custom-banner-content">          
-        
+        .page-content ul,
+        .page-content ol {
+            color: var(--text-secondary);
+            padding-left: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
 
-               <h1 class="custom-banner-title text-left">
-                    @if(session()->get('lang') == 'ru')
-                        {!! $submenu->title_ru !!}
-                    @elseif(session()->get('lang') == 'en')
-                        {!! $submenu->title_en !!}
-                    @else
-                        {!! $submenu->title_tj !!}
-                    @endif
-                </h1>
+        .page-content a {
+            color: var(--gold);
+            text-decoration: underline;
+            transition: opacity 0.3s;
+        }
 
+        .page-content a:hover {
+            opacity: 0.8;
+        }
+
+        .page-content table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        .page-content table th,
+        .page-content table td {
+            padding: 12px 16px;
+            border: 1px solid var(--dark-border);
+            color: var(--text-secondary);
+        }
+
+        .page-content table th {
+            background: var(--dark-surface);
+            color: var(--gold);
+            font-weight: 600;
+        }
+    </style>
+@endpush
+
+@section('content')
+    {{-- Заголовок страницы --}}
+    <section class="pt-16 pb-12 px-6" style="background: var(--dark-surface); border-bottom: 1px solid var(--dark-border);">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="display-font text-4xl md:text-5xl font-bold mb-4 text-white">
+                @if(session()->get('lang') == 'ru')
+                    {!! $submenu->title_ru !!}
+                @elseif(session()->get('lang') == 'en')
+                    {!! $submenu->title_en !!}
+                @else
+                    {!! $submenu->title_tj !!}
+                @endif
+            </h1>
+            <div class="gold-divider"></div>
         </div>
-    </div>
-</section>
-<!-- Banner End -->
+    </section>
 
-
-<section class="portfolio_details my-5">
-    <div class="container">
-        <div class="port_main">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="port_details_content">                       
-                 
-                        <p class="quote">
-                            @if (session()->get('lang') == 'ru')
-                                {!! $submenu->text_ru !!}
-                            @elseif(session()->get('lang') == 'en')
-                                {!! $submenu->text_en !!}                   
-                            @else
-                                {!! $submenu->text_tj !!}
-                            @endif
-                        </p>
-
-                    </div>
-                </div>
+    {{-- Контент --}}
+    <section class="py-16 px-6">
+        <div class="max-w-4xl mx-auto">
+            <div class="page-content text-lg leading-relaxed">
+                @if(session()->get('lang') == 'ru')
+                    {!! $submenu->text_ru !!}
+                @elseif(session()->get('lang') == 'en')
+                    {!! $submenu->text_en !!}
+                @else
+                    {!! $submenu->text_tj !!}
+                @endif
             </div>
-
         </div>
-    </div>
-</section>
-
-
-<style>
-
-
-/* ==== Modern Banner ==== */
-.custom-banner {
-    background: #f7f9fc;
-    padding: 60px 0;
-    border-bottom: 1px solid #e4e7eb;
-}
-
-.custom-banner-content {
-    text-align: left;
-    animation: fadeIn 0.8s ease-in-out;
-}
-
-.custom-banner-title {
-    font-size: 42px;
-    font-weight: 700;
-    color: #1d1d1d;
-    margin: 0 0 15px 0;
-    line-height: 1.2;
-}
-
-/* ==== Breadcrumb ==== */
-.custom-breadcrumb {
-    display: flex;
-    align-items: center;
-    flex-wrap: nowrap;
-    gap: 8px;
-    list-style: none;
-    padding: 0;
-    margin: 0;
-}
-
-.custom-breadcrumb-item {
-    white-space: nowrap;
-    font-size: 16px;
-    color: #6c6c6c;
-}
-
-.custom-breadcrumb-item a {
-    text-decoration: none;
-    color: #0070c9;
-    transition: color 0.2s ease;
-}
-
-.custom-breadcrumb-item a:hover {
-    color: #004a88;
-}
-
-/* Slash separator */
-.custom-breadcrumb-item + .custom-breadcrumb-item::before {
-    content: "/";
-    color: #b4b4b4;
-    padding: 0 4px;
-}
-
-/* Active breadcrumb */
-.custom-breadcrumb-item.active {
-    color: #1d1d1d;
-    font-weight: 600;
-}
-
-/* Fade animation */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* ==== Mobile ==== */
-@media (max-width: 576px) {
-    .custom-banner {
-        padding: 35px 0;
-    }
-    .custom-banner-title {
-        font-size: 30px;
-    }
-    .custom-breadcrumb-item {
-        font-size: 14px;
-    }
-}
-
-
-
-</style>
-
+    </section>
 @endsection

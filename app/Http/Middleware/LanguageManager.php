@@ -13,8 +13,15 @@ class LanguageManager
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
+    /**
+     * Устанавливает session('lang') по умолчанию ('tj'), если ещё не задан.
+     * Должен выполняться после StartSession.
+     */
     public function handle(Request $request, Closure $next): Response
     {
+        if (!session()->has('lang')) {
+            session()->put('lang', 'tj');
+        }
         return $next($request);
     }
 }

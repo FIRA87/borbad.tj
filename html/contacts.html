@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Контакты - Борбад</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --burgundy-deep: #5C0A0A;
+            --burgundy-main: #8B1538;
+            --burgundy-light: #B8264D;
+            --gold: #D4AF37;
+            --gold-light: #F4E5B8;
+            --cream: #FFF8F0;
+            --charcoal: #1A1A1A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: var(--cream);
+            color: var(--charcoal);
+        }
+
+        .display-font {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--burgundy-main), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-link {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--gold);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            transform: translateX(0);
+        }
+
+        .decorative-line {
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--burgundy-main), var(--gold));
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+
+        .contact-card {
+            transition: all 0.3s ease;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(92, 10, 10, 0.2);
+        }
+
+        .texture-overlay {
+            position: relative;
+        }
+
+        .texture-overlay::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        input, textarea {
+            transition: all 0.3s ease;
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--burgundy-main), var(--burgundy-deep));
+            color: var(--gold-light);
+            border: 2px solid var(--gold);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-submit::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(212, 175, 55, 0.3);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-submit:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .btn-submit:hover {
+            border-color: var(--gold-light);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(139, 21, 56, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="display-font text-3xl font-bold gradient-text">
+                    Борбад
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="nav-link text-lg font-medium text-gray-800 hover:text-burgundy-main pb-1">Главная</a>
+                    <a href="afisha.html" class="nav-link text-lg font-medium text-gray-800 hover:text-burgundy-main pb-1">Афиша</a>
+                    <a href="about.html" class="nav-link text-lg font-medium text-gray-800 hover:text-burgundy-main pb-1">О нас</a>
+                    <a href="gallery.html" class="nav-link text-lg font-medium text-gray-800 hover:text-burgundy-main pb-1">Галерея</a>
+                    <a href="contacts.html" class="nav-link text-lg font-medium text-gray-800 hover:text-burgundy-main pb-1">Контакты</a>
+                </div>
+
+                <button class="md:hidden text-gray-800" id="mobileMenuBtn">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="hidden md:hidden mt-4 pb-4" id="mobileMenu">
+                <a href="index.html" class="block py-2 text-lg font-medium text-gray-800 hover:text-burgundy-main">Главная</a>
+                <a href="afisha.html" class="block py-2 text-lg font-medium text-gray-800 hover:text-burgundy-main">Афиша</a>
+                <a href="about.html" class="block py-2 text-lg font-medium text-gray-800 hover:text-burgundy-main">О нас</a>
+                <a href="gallery.html" class="block py-2 text-lg font-medium text-gray-800 hover:text-burgundy-main">Галерея</a>
+                <a href="contacts.html" class="block py-2 text-lg font-medium text-gray-800 hover:text-burgundy-main">Контакты</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <section class="pt-32 pb-16 px-6 texture-overlay" style="background: linear-gradient(135deg, #FFF8F0 0%, #F4E5B8 100%);">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="display-font text-6xl md:text-7xl font-black mb-6 fade-in-up" style="color: var(--burgundy-deep);">
+                Контакты
+            </h1>
+            <div class="decorative-line mx-auto delay-100 fade-in-up"></div>
+            <p class="text-2xl text-gray-700 mt-6 fade-in-up delay-200">
+                Свяжитесь с нами
+            </p>
+        </div>
+    </section>
+
+    <!-- Contact Info Section -->
+    <section class="py-16 px-6 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-3 gap-8 mb-16">
+                <!-- Contact Card 1 -->
+                <div class="contact-card bg-white rounded-2xl p-8 shadow-xl border-2" style="border-color: var(--gold);">
+                    <div class="w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--burgundy-main), var(--burgundy-deep));">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <h3 class="display-font text-2xl font-bold text-center mb-4" style="color: var(--burgundy-deep);">
+                        Адрес
+                    </h3>
+                    <p class="text-center text-lg text-gray-700">
+                        г. Душанбе<br/>
+                        Таджикистан<br/>
+                        ул. Рудаки, 42
+                    </p>
+                </div>
+
+                <!-- Contact Card 2 -->
+                <div class="contact-card bg-white rounded-2xl p-8 shadow-xl border-2" style="border-color: var(--gold);">
+                    <div class="w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--burgundy-light), var(--burgundy-main));">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/>
+                        </svg>
+                    </div>
+                    <h3 class="display-font text-2xl font-bold text-center mb-4" style="color: var(--burgundy-deep);">
+                        Телефон
+                    </h3>
+                    <p class="text-center text-lg text-gray-700">
+                        +992 XX XXX XXXX<br/>
+                        +992 XX XXX YYYY<br/>
+                        Касса: +992 XX XXX ZZZZ
+                    </p>
+                </div>
+
+                <!-- Contact Card 3 -->
+                <div class="contact-card bg-white rounded-2xl p-8 shadow-xl border-2" style="border-color: var(--gold);">
+                    <div class="w-16 h-16 mx-auto mb-6 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, #D4AF37, #8B1538);">
+                        <svg class="w-8 h-8 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+                        </svg>
+                    </div>
+                    <h3 class="display-font text-2xl font-bold text-center mb-4" style="color: var(--burgundy-deep);">
+                        Email
+                    </h3>
+                    <p class="text-center text-lg text-gray-700">
+                        info@borbad.tj<br/>
+                        tickets@borbad.tj<br/>
+                        pr@borbad.tj
+                    </p>
+                </div>
+            </div>
+
+            <!-- Working Hours -->
+            <div class="bg-white rounded-2xl p-8 shadow-xl border-2 max-w-2xl mx-auto" style="border-color: var(--gold);">
+                <h3 class="display-font text-3xl font-bold text-center mb-6" style="color: var(--burgundy-deep);">
+                    Режим работы
+                </h3>
+                <div class="grid md:grid-cols-2 gap-6 text-lg">
+                    <div class="flex justify-between items-center p-4 rounded-lg" style="background: var(--cream);">
+                        <span class="font-semibold">Понедельник - Пятница</span>
+                        <span style="color: var(--burgundy-main);">10:00 - 20:00</span>
+                    </div>
+                    <div class="flex justify-between items-center p-4 rounded-lg" style="background: var(--cream);">
+                        <span class="font-semibold">Суббота - Воскресенье</span>
+                        <span style="color: var(--burgundy-main);">12:00 - 21:00</span>
+                    </div>
+                    <div class="flex justify-between items-center p-4 rounded-lg md:col-span-2" style="background: var(--cream);">
+                        <span class="font-semibold">Касса</span>
+                        <span style="color: var(--burgundy-main);">За 2 часа до начала мероприятия</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Form Section -->
+    <section class="py-20 px-6" style="background: linear-gradient(135deg, #FFF8F0 0%, white 100%);">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="display-font text-5xl font-bold mb-6" style="color: var(--burgundy-deep);">
+                    Напишите нам
+                </h2>
+                <div class="decorative-line mx-auto"></div>
+                <p class="text-xl text-gray-600 mt-6">
+                    Мы ответим вам в ближайшее время
+                </p>
+            </div>
+
+            <form class="bg-white rounded-2xl p-8 md:p-12 shadow-2xl border-2" style="border-color: var(--gold);">
+                <div class="mb-6">
+                    <label class="block text-lg font-semibold mb-2" style="color: var(--burgundy-deep);">
+                        Ваше имя
+                    </label>
+                    <input type="text" 
+                           class="w-full px-4 py-3 rounded-lg border-2 text-lg" 
+                           style="border-color: var(--burgundy-main);"
+                           placeholder="Введите ваше имя">
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-lg font-semibold mb-2" style="color: var(--burgundy-deep);">
+                        Email
+                    </label>
+                    <input type="email" 
+                           class="w-full px-4 py-3 rounded-lg border-2 text-lg" 
+                           style="border-color: var(--burgundy-main);"
+                           placeholder="your@email.com">
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-lg font-semibold mb-2" style="color: var(--burgundy-deep);">
+                        Телефон
+                    </label>
+                    <input type="tel" 
+                           class="w-full px-4 py-3 rounded-lg border-2 text-lg" 
+                           style="border-color: var(--burgundy-main);"
+                           placeholder="+992 XX XXX XXXX">
+                </div>
+
+                <div class="mb-6">
+                    <label class="block text-lg font-semibold mb-2" style="color: var(--burgundy-deep);">
+                        Тема обращения
+                    </label>
+                    <select class="w-full px-4 py-3 rounded-lg border-2 text-lg" 
+                            style="border-color: var(--burgundy-main);">
+                        <option>Покупка билетов</option>
+                        <option>Сотрудничество</option>
+                        <option>Аренда зала</option>
+                        <option>Общие вопросы</option>
+                        <option>Другое</option>
+                    </select>
+                </div>
+
+                <div class="mb-8">
+                    <label class="block text-lg font-semibold mb-2" style="color: var(--burgundy-deep);">
+                        Сообщение
+                    </label>
+                    <textarea class="w-full px-4 py-3 rounded-lg border-2 text-lg" 
+                              style="border-color: var(--burgundy-main);"
+                              rows="6"
+                              placeholder="Опишите ваш вопрос или предложение..."></textarea>
+                </div>
+
+                <button type="submit" class="btn-submit w-full py-4 rounded-full text-xl font-semibold relative z-10">
+                    Отправить сообщение
+                </button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Map Section -->
+    <section class="py-16 px-6 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="display-font text-5xl font-bold mb-6" style="color: var(--burgundy-deep);">
+                    Как нас найти
+                </h2>
+                <div class="decorative-line mx-auto"></div>
+            </div>
+            
+            <div class="rounded-2xl overflow-hidden shadow-2xl h-96" style="background: linear-gradient(135deg, var(--burgundy-main), var(--burgundy-deep));">
+                <div class="w-full h-full flex items-center justify-center">
+                    <div class="text-center text-white">
+                        <svg class="w-20 h-20 mx-auto mb-4 opacity-50" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                        </svg>
+                        <p class="text-xl">Карта загружается...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6 texture-overlay" style="background: linear-gradient(135deg, var(--burgundy-deep), var(--burgundy-main));">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="display-font text-2xl font-bold mb-4" style="color: var(--gold);">Борбад</h3>
+                    <p class="text-gray-300 text-lg">
+                        Театрально-концертный зал
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-lg" style="color: var(--gold-light);">Навигация</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-300 hover:text-white transition">Главная</a></li>
+                        <li><a href="afisha.html" class="text-gray-300 hover:text-white transition">Афиша</a></li>
+                        <li><a href="about.html" class="text-gray-300 hover:text-white transition">О нас</a></li>
+                        <li><a href="gallery.html" class="text-gray-300 hover:text-white transition">Галерея</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-lg" style="color: var(--gold-light);">Контакты</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li>г. Душанбе, Таджикистан</li>
+                        <li>Тел: +992 XX XXX XXXX</li>
+                        <li>Email: info@borbad.tj</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-lg" style="color: var(--gold-light);">Социальные сети</h4>
+                    <div class="flex gap-4">
+                        <a href="#" class="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110" style="background: rgba(255, 255, 255, 0.2);">
+                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110" style="background: rgba(255, 255, 255, 0.2);">
+                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                            </svg>
+                        </a>
+                        <a href="#" class="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:scale-110" style="background: rgba(255, 255, 255, 0.2);">
+                            <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="border-t pt-6" style="border-color: rgba(212, 175, 55, 0.3);">
+                <p class="text-center text-gray-400">
+                    &copy; 2026 Борбад. Все права защищены.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>

@@ -1,104 +1,87 @@
 @extends('frontend.master')
-@section('content')
-
 
 @section('title')
-    @if (session()->get('lang') == 'ru')
-        Страница
+    @if(session()->get('lang') == 'ru')
+        {{ $sub_submenu->title_ru }}
     @elseif(session()->get('lang') == 'en')
-        Саҳифа
+        {{ $sub_submenu->title_en }}
     @else
-        Page
+        {{ $sub_submenu->title_tj }}
     @endif
 @endsection
 
+@push('styles')
+    <style>
+        .page-content img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+        }
 
-  <div class="breadcrumb-area d-none d-md-block" style="display: none !important; ">
-    <div class="container">
-        <div class="row">
-            <div class="col-12">
-                <div class="breadcrumb_box text-left">
-                    <!-- breadcrumb-list start -->
-                    <ul class="breadcrumb-list">
-                        <li class="breadcrumb-item"><a href="/">
-                                @if (session()->get('lang') == 'ru')
-                                    Главная
-                                @elseif(session()->get('lang') == 'en')
-                                    Home
-                                @elseif(session()->get('lang') == 'fr')
-                                    Accueil
-                                @elseif(session()->get('lang') == 'es')
-                                    Inicio
-                                @elseif(session()->get('lang') == 'ch')
-                                    主页
-                                @else
-                                    Асосӣ
-                                @endif
-                            </a></li>/
-                        <li><a href="{{ route('submenu.show', $submenu) }}">
-                                @if (session()->get('lang') == 'ru')
-                                    {!! $submenu->title_ru !!}
-                                @elseif(session()->get('lang') == 'en')
-                                    {!! $submenu->title_en !!}
-                                @else
-                                    {!! $submenu->title_tj !!}
-                                @endif
-                            </a></li>
+        .page-content p {
+            margin-bottom: 1.2rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
 
-                    </ul>
-                    <!-- breadcrumb-list end -->
-                </div>
+        .page-content h2,
+        .page-content h3,
+        .page-content h4 {
+            color: var(--text-primary);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .page-content ul,
+        .page-content ol {
+            color: var(--text-secondary);
+            padding-left: 1.5rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .page-content a {
+            color: var(--gold);
+            text-decoration: underline;
+            transition: opacity 0.3s;
+        }
+
+        .page-content a:hover {
+            opacity: 0.8;
+        }
+    </style>
+@endpush
+
+@section('content')
+    {{-- Заголовок страницы --}}
+    <section class="pt-16 pb-12 px-6" style="background: var(--dark-surface); border-bottom: 1px solid var(--dark-border);">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="display-font text-4xl md:text-5xl font-bold mb-4 text-white">
+                @if(session()->get('lang') == 'ru')
+                    {{ $sub_submenu->title_ru }}
+                @elseif(session()->get('lang') == 'en')
+                    {{ $sub_submenu->title_en }}
+                @else
+                    {{ $sub_submenu->title_tj }}
+                @endif
+            </h1>
+            <div class="gold-divider"></div>
+        </div>
+    </section>
+
+    {{-- Контент --}}
+    <section class="py-16 px-6">
+        <div class="max-w-4xl mx-auto">
+            <div class="page-content text-lg leading-relaxed">
+                @if(session()->get('lang') == 'ru')
+                    {!! $sub_submenu->text_ru !!}
+                @elseif(session()->get('lang') == 'en')
+                    {!! $sub_submenu->text_en !!}
+                @else
+                    {!! $sub_submenu->text_tj !!}
+                @endif
             </div>
         </div>
-    </div>
-</div>
-
-
-<section class="portfolio_details my-5">
-    <div class="container">
-        <div class="port_main">
-            <div class="row">
-                <div class="col-lg-12">
-                    <div class="port_details_content">
-                        <h2>
-                            @if (session()->get('lang') == 'ru')
-                                {{ $sub_submenu->title_ru }}
-                            @elseif(session()->get('lang') == 'en')
-                                {{ $sub_submenu->title_en }}
-                            @elseif(session()->get('lang') == 'fr')
-                                {{ $sub_submenu->title_fr }}
-                            @elseif(session()->get('lang') == 'es')
-                                {{ $sub_submenu->title_es }}
-                            @elseif(session()->get('lang') == 'ch')
-                                {{ $sub_submenu->title_ch }}
-                            @else
-                                {{ $sub_submenu->title_tj }}
-                            @endif
-                        </h2>
-                        <p class="quote">
-                            @if (session()->get('lang') == 'ru')
-                                {!! $sub_submenu->text_ru !!}
-                            @elseif(session()->get('lang') == 'en')
-                                {!! $sub_submenu->text_en !!}
-                            @elseif(session()->get('lang') == 'fr')
-                                {!! $sub_submenu->text_fr !!}
-                            @elseif(session()->get('lang') == 'es')
-                                {!! $sub_submenu->text_es !!}
-                            @elseif(session()->get('lang') == 'ch')
-                                {!! $sub_submenu->text_ch !!}
-                            @else
-                                {!! $sub_submenu->text_tj !!}
-                            @endif
-                        </p>
-
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-</section>
-
-
-
+    </section>
 @endsection

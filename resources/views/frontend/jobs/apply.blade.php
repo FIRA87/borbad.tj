@@ -1,231 +1,242 @@
 @extends('frontend.master')
 
 @section('title')
-    @trans('apply')   
+    @if (session()->get('lang') == 'ru')
+        Подать заявку
+    @elseif(session()->get('lang') == 'en')
+        Apply
+    @else
+        Аризадиҳӣ
+    @endif
 @endsection
 
-
 @section('content')
-<div class="container py-5">
-    <div class="row">
-        <div class="col-lg-8 mx-auto">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="{{ route('frontend.jobs.index') }}">@trans('vacancies') </a>
-                    </li>
-                    <li class="breadcrumb-item">
-                        <a href="{{ route('frontend.jobs.show', $job->slug) }}">
-                            {{ $job->{'title_'.app()->getLocale()} }}
-                        </a>
-                    </li>
-                    <li class="breadcrumb-item active">@trans('apply')         </li>
-                </ol>
-            </nav>
+    {{-- Заголовок --}}
+    <section class="pt-16 pb-12 px-6" style="background: var(--dark-surface); border-bottom: 1px solid var(--dark-border);">
+        <div class="max-w-3xl mx-auto">
+            {{-- Хлебные крошки --}}
+            <div class="flex items-center gap-2 text-sm mb-6 flex-wrap">
+                <a href="{{ route('frontend.jobs.index') }}" class="text-gray-500 hover:text-white transition">
+                    @if (session()->get('lang') == 'ru')
+                        Вакансии
+                    @elseif(session()->get('lang') == 'en')
+                        Vacancies
+                    @else
+                        Вакансияҳо
+                    @endif
+                </a>
+                <svg class="w-4 h-4 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+                <a href="{{ route('frontend.jobs.show', $job->slug) }}"
+                    class="text-gray-500 hover:text-white transition truncate">
 
-            <div class="card shadow">
-                <div class="card-header bg-primary">
-                    <h3 class="mb-0 text-white">
-                        @if(session()->get('lang') == 'ru')
-                            Подать заявку на вакансию
-                        @elseif(session()->get('lang') == 'en')
-                            Apply for Vacancy
-                        @else
-                            Ариза додан барои ҷои корӣ
-                        @endif
-                    </h3>
-                    <p class="mb-0 mt-2 text-white">{{ $job->{'title_'.app()->getLocale()} }}</p>
-                </div>
-
-                <div class="card-body">
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <ul class="mb-0">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
+                    @if (session()->get('lang') == 'ru')
+                        {{ $job->title_ru }}
+                    @elseif(session()->get('lang') == 'en')
+                        {{ $job->title_en }}
+                    @else
+                        {{ $job->title_tj }}
                     @endif
 
-                    <form action="{{ route('frontend.jobs.submit') }}" method="POST" enctype="multipart/form-data" id="jobApplicationForm">
-                        @csrf
-                        <input type="hidden" name="job_id" value="{{ $job->id }}">
+                </a>
+                <svg class="w-4 h-4 text-gray-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+                <span class="text-gray-400">
+                    @if (session()->get('lang') == 'ru')
+                        Заявка
+                    @elseif(session()->get('lang') == 'en')
+                        Application
+                    @else
+                        Ариза
+                    @endif
+                </span>
+            </div>
 
-                        <!-- Личные данные -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <h5 class="border-bottom pb-2 mb-3">
-                                    @if(session()->get('lang') == 'ru')
-                                        Личные данные
-                                    @elseif(session()->get('lang') == 'en')
-                                        Personal Information
-                                    @else
-                                        Маълумоти шахсӣ
-                                    @endif
-                                </h5>
-                            </div>
+            <p class="text-sm uppercase tracking-widest mb-3" style="color: var(--gold);">
+                @if (session()->get('lang') == 'ru')
+                    Подать заявку на вакансию
+                @elseif(session()->get('lang') == 'en')
+                    Apply for vacancy
+                @else
+                    Ариза додан барои ҷои корӣ
+                @endif
+            </p>
+            <h1 class="display-font text-3xl md:text-4xl font-bold text-white">
 
-                            <div class="col-md-6 mb-3">
-                                <label for="first_name" class="form-label">
-                                    @if(session()->get('lang') == 'ru')
+                @if (session()->get('lang') == 'ru')
+                    {{ $job->title_ru }}
+                @elseif(session()->get('lang') == 'en')
+                    {{ $job->title_en }}
+                @else
+                    {{ $job->title_tj }}
+                @endif
+            </h1>
+        </div>
+    </section>
+
+    <section class="py-16 px-6 section-dark">
+        <div class="max-w-3xl mx-auto">
+            {{-- Ошибки валидации --}}
+            @if ($errors->any())
+                <div class="mb-8 p-4 rounded-xl text-sm"
+                    style="background: rgba(239, 68, 68, 0.1); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171;">
+                    <ul class="list-disc list-inside space-y-1">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
+            <div class="rounded-2xl overflow-hidden"
+                style="background: var(--dark-card); border: 1px solid var(--dark-border);">
+                {{-- Верхний золотой акцент --}}
+                <div style="height: 2px; background: linear-gradient(90deg, transparent, var(--gold), transparent);"></div>
+
+                <form action="{{ route('frontend.jobs.submit') }}" method="POST" enctype="multipart/form-data"
+                    id="jobApplicationForm" class="p-8 md:p-10">
+                    @csrf
+                    <input type="hidden" name="job_id" value="{{ $job->id }}">
+
+                    {{-- Блок: Личные данные --}}
+                    <div class="mb-10">
+                        <h2 class="display-font text-xl font-bold text-white mb-6 flex items-center gap-3">
+                            <div class="w-1 h-5 rounded-full" style="background: var(--gold);"></div>
+                            @if (session()->get('lang') == 'ru')
+                                Личные данные
+                            @elseif(session()->get('lang') == 'en')
+                                Personal Information
+                            @else
+                                Маълумоти шахсӣ
+                            @endif
+                        </h2>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-2">
+                                    @if (session()->get('lang') == 'ru')
                                         Имя
                                     @elseif(session()->get('lang') == 'en')
                                         First Name
                                     @else
                                         Ном
                                     @endif
-                                    <span class="text-danger">*</span>
+                                    <span style="color: var(--gold);">*</span>
                                 </label>
-                                <input type="text" class="form-control @error('first_name') is-invalid @enderror" 
-                                       id="first_name" name="first_name" value="{{ old('first_name') }}" required>
-                                @error('first_name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <input type="text" name="first_name" value="{{ old('first_name') }}" required
+                                    class="form-input @error('first_name') border-red-500 @enderror">
                             </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="last_name" class="form-label">
-                                    @if(session()->get('lang') == 'ru')
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-2">
+                                    @if (session()->get('lang') == 'ru')
                                         Фамилия
                                     @elseif(session()->get('lang') == 'en')
                                         Last Name
                                     @else
                                         Насаб
                                     @endif
-                                    <span class="text-danger">*</span>
+                                    <span style="color: var(--gold);">*</span>
                                 </label>
-                                <input type="text" class="form-control @error('last_name') is-invalid @enderror" 
-                                       id="last_name" name="last_name" value="{{ old('last_name') }}" required>
-                                @error('last_name')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <input type="text" name="last_name" value="{{ old('last_name') }}" required
+                                    class="form-input @error('last_name') border-red-500 @enderror">
                             </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="email" class="form-label">
-                                    @if(session()->get('lang') == 'ru')
-                                        Email
-                                    @elseif(session()->get('lang') == 'en')
-                                        Email
-                                    @else
-                                        Почтаи электронӣ
-                                    @endif
-                                    <span class="text-danger">*</span>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-2">
+                                    Email <span style="color: var(--gold);">*</span>
                                 </label>
-                                <input type="email" class="form-control @error('email') is-invalid @enderror" 
-                                       id="email" name="email" value="{{ old('email') }}" required>
-                                @error('email')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <input type="email" name="email" value="{{ old('email') }}" required
+                                    class="form-input @error('email') border-red-500 @enderror">
                             </div>
-
-                            <div class="col-md-6 mb-3">
-                                <label for="phone" class="form-label">
-                                    @if(session()->get('lang') == 'ru')
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-2">
+                                    @if (session()->get('lang') == 'ru')
                                         Телефон
                                     @elseif(session()->get('lang') == 'en')
                                         Phone
                                     @else
                                         Телефон
                                     @endif
-                                    <span class="text-danger">*</span>
+                                    <span style="color: var(--gold);">*</span>
                                 </label>
-                                <input type="tel" class="form-control @error('phone') is-invalid @enderror" 
-                                       id="phone" name="phone" value="{{ old('phone') }}" 
-                                       placeholder="+992 XXX XX XX XX" required>
-                                @error('phone')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
+                                <input type="tel" name="phone" value="{{ old('phone') }}" required
+                                    placeholder="+992 XXX XX XX XX"
+                                    class="form-input @error('phone') border-red-500 @enderror">
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Сопроводительное письмо -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <h5 class="border-bottom pb-2 mb-3">
-                                    @if(session()->get('lang') == 'ru')
-                                        Сопроводительное письмо
-                                    @elseif(session()->get('lang') == 'en')
-                                        Cover Letter
-                                    @else
-                                        Мактуби ҳамроҳкунанда
-                                    @endif
-                                </h5>
-                            </div>
+                    {{-- Блок: Сопроводительное письмо --}}
+                    <div class="mb-10">
+                        <h2 class="display-font text-xl font-bold text-white mb-6 flex items-center gap-3">
+                            <div class="w-1 h-5 rounded-full" style="background: var(--gold);"></div>
+                            @if (session()->get('lang') == 'ru')
+                                Сопроводительное письмо
+                            @elseif(session()->get('lang') == 'en')
+                                Cover Letter
+                            @else
+                                Мактуби ҳамроҳкунанда
+                            @endif
+                        </h2>
 
-                            <div class="col-12 mb-3">
-                                <label for="cover_letter" class="form-label">
-                                    @if(session()->get('lang') == 'ru')
-                                        Расскажите о себе и почему вы хотите работать у нас
-                                    @elseif(session()->get('lang') == 'en')
-                                        Tell us about yourself and why you want to work with us
-                                    @else
-                                        Дар бораи худ нависед ва чаро мехоҳед дар назди мо кор кунед
-                                    @endif
-                                </label>
-                                <textarea class="form-control @error('cover_letter') is-invalid @enderror" 
-                                          id="cover_letter" name="cover_letter" rows="6" 
-                                          placeholder="@if(session()->get('lang') == 'ru')Введите ваше сопроводительное письмо...@elseif(session()->get('lang') == 'en')Enter your cover letter...@elseМактуби ҳамроҳкунандаи худро ворид кунед...@endif">{{ old('cover_letter') }}</textarea>
-                                @error('cover_letter')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <small class="text-muted">
-                                    @if(session()->get('lang') == 'ru')
-                                        Максимум 5000 символов
-                                    @elseif(session()->get('lang') == 'en')
-                                        Maximum 5000 characters
-                                    @else
-                                        Ҳадди аксар 5000 аломат
-                                    @endif
-                                </small>
-                            </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-2">
+                                @if (session()->get('lang') == 'ru')
+                                    Расскажите о себе
+                                @elseif(session()->get('lang') == 'en')
+                                    Tell us about yourself
+                                @else
+                                    Дар бораи худ нависед
+                                @endif
+                            </label>
+                            <textarea name="cover_letter" rows="5" class="form-input"
+                                placeholder="@if (session()->get('lang') == 'ru') Почему вы хотите работать у нас...@elseif(session()->get('lang') == 'en')Why do you want to work with us...@elseЧаро мехоҳед дар назди мо кор кунед... @endif">{{ old('cover_letter') }}</textarea>
+                            <p class="text-xs text-gray-600 mt-2">
+                                @if (session()->get('lang') == 'ru')
+                                    Максимум 5000 символов
+                                @elseif(session()->get('lang') == 'en')
+                                    Maximum 5000 characters
+                                @else
+                                    Ҳадди аксар 5000 аломат
+                                @endif
+                            </p>
                         </div>
+                    </div>
 
-                        <!-- Документы -->
-                        <div class="row mb-4">
-                            <div class="col-12">
-                                <h5 class="border-bottom pb-2 mb-3">
-                                    @if(session()->get('lang') == 'ru')
-                                        Документы
-                                    @elseif(session()->get('lang') == 'en')
-                                        Documents
-                                    @else
-                                        Ҳуҷҷатҳо
-                                    @endif
-                                </h5>
-                            </div>
+                    {{-- Блок: Документы --}}
+                    <div class="mb-10">
+                        <h2 class="display-font text-xl font-bold text-white mb-6 flex items-center gap-3">
+                            <div class="w-1 h-5 rounded-full" style="background: var(--gold);"></div>
+                            @if (session()->get('lang') == 'ru')
+                                Документы
+                            @elseif(session()->get('lang') == 'en')
+                                Documents
+                            @else
+                                Ҳуҷҷатҳо
+                            @endif
+                        </h2>
 
-                            <div class="col-12 mb-3">
-                                <label for="resume" class="form-label">
-                                    @if(session()->get('lang') == 'ru')
+                        <div class="space-y-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-2">
+                                    @if (session()->get('lang') == 'ru')
                                         Резюме (CV)
                                     @elseif(session()->get('lang') == 'en')
                                         Resume (CV)
                                     @else
                                         Резюме (CV)
                                     @endif
-                                    <span class="text-danger">*</span>
+                                    <span style="color: var(--gold);">*</span>
                                 </label>
-                                <input type="file" class="form-control @error('resume') is-invalid @enderror" 
-                                       id="resume" name="resume" accept=".pdf,.doc,.docx" required>
-                                @error('resume')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <small class="text-muted">
-                                    @if(session()->get('lang') == 'ru')
-                                        Форматы: PDF, DOC, DOCX. Максимальный размер: 5MB
-                                    @elseif(session()->get('lang') == 'en')
-                                        Formats: PDF, DOC, DOCX. Maximum size: 5MB
-                                    @else
-                                        Форматҳо: PDF, DOC, DOCX. Ҳаҷми максималӣ: 5MB
-                                    @endif
-                                </small>
+                                <input type="file" name="resume" accept=".pdf,.doc,.docx" required
+                                    class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-transparent file:text-gray-400 @error('resume') border-red-500 @enderror">
+                                <p class="text-xs text-gray-600 mt-2">PDF, DOC, DOCX — max 5MB</p>
                             </div>
 
-                            <div class="col-12 mb-3">
-                                <label for="additional_files" class="form-label">
-                                    @if(session()->get('lang') == 'ru')
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-2">
+                                    @if (session()->get('lang') == 'ru')
                                         Дополнительные документы
                                     @elseif(session()->get('lang') == 'en')
                                         Additional Documents
@@ -233,151 +244,134 @@
                                         Ҳуҷҷатҳои иловагӣ
                                     @endif
                                 </label>
-                                <input type="file" class="form-control @error('additional_files.*') is-invalid @enderror" 
-                                       id="additional_files" name="additional_files[]" 
-                                       accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" multiple>
-                                @error('additional_files.*')
-                                    <div class="invalid-feedback">{{ $message }}</div>
-                                @enderror
-                                <small class="text-muted">
-                                    @if(session()->get('lang') == 'ru')
-                                        Портфолио, сертификаты, рекомендации и т.д. Можно загрузить несколько файлов
+                                <input type="file" name="additional_files[]" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                    multiple
+                                    class="form-input file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-transparent file:text-gray-400">
+                                <p class="text-xs text-gray-600 mt-2">
+                                    @if (session()->get('lang') == 'ru')
+                                        Портфолио, сертификаты, рекомендации
                                     @elseif(session()->get('lang') == 'en')
-                                        Portfolio, certificates, recommendations, etc. Multiple files can be uploaded
+                                        Portfolio, certificates, recommendations
                                     @else
-                                        Портфолио, сертификатҳо, тавсияномаҳо ва ғайра. Чанд файл бор кардан мумкин аст
+                                        Портфолио, сертификатҳо, тавсияномаҳо
                                     @endif
-                                </small>
+                                </p>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Кнопки -->
-                        <div class="row">
-                            <div class="col-12">
-                                <button type="submit" class="btn btn-success btn-lg me-2">
-                                    <i class="fas fa-paper-plane"></i>
-                                    @if(session()->get('lang') == 'ru')
-                                        Отправить заявку
-                                    @elseif(session()->get('lang') == 'en')
-                                        Submit Application
-                                    @else
-                                        Ариза фиристодан
-                                    @endif
-                                </button>
-                                <a href="{{ route('frontend.jobs.show', $job->slug) }}" class="btn btn-secondary btn-lg">
-                                    <i class="fas fa-times"></i>
-                                    @if(session()->get('lang') == 'ru')
-                                        Отмена
-                                    @elseif(session()->get('lang') == 'en')
-                                        Cancel
-                                    @else
-                                        Бекор кардан
-                                    @endif
-                                </a>
-                            </div>
-                        </div>
+                    {{-- Кнопки --}}
+                    <div class="flex flex-col sm:flex-row gap-4">
+                        <button type="submit" class="btn-primary flex-1 py-4 text-lg font-semibold text-center"
+                            id="submitBtn">
+                            @if (session()->get('lang') == 'ru')
+                                Отправить заявку
+                            @elseif(session()->get('lang') == 'en')
+                                Submit Application
+                            @else
+                                Ариза фиристодан
+                            @endif
+                        </button>
+                        <a href="{{ route('frontend.jobs.show', $job->slug) }}"
+                            class="btn-outline flex-1 py-4 text-center">
+                            @if (session()->get('lang') == 'ru')
+                                Отмена
+                            @elseif(session()->get('lang') == 'en')
+                                Cancel
+                            @else
+                                Бекор кардан
+                            @endif
+                        </a>
+                    </div>
 
-                        <div class="row mt-3">
-                            <div class="col-12">
-                                <small class="text-muted">
-                                    <span class="text-danger">*</span>
-                                    @if(session()->get('lang') == 'ru')
-                                        Обязательные поля
-                                    @elseif(session()->get('lang') == 'en')
-                                        Required fields
-                                    @else
-                                        Майдoнҳои ҳатмӣ
-                                    @endif
-                                </small>
-                            </div>
-                        </div>
-                    </form>
-                </div>
+                    <p class="text-xs text-gray-600 mt-4">
+                        <span style="color: var(--gold);">*</span>
+                        @if (session()->get('lang') == 'ru')
+                            Обязательные поля
+                        @elseif(session()->get('lang') == 'en')
+                            Required fields
+                        @else
+                            Майдонҳои ҳатмӣ
+                        @endif
+                    </p>
+                </form>
             </div>
 
-            <!-- Информация о вакансии -->
-            <div class="card mt-4 bg-light">
-                <div class="card-body">
-                    <h5>
-                        @if(session()->get('lang') == 'ru')
-                            О вакансии
-                        @elseif(session()->get('lang') == 'en')
-                            About the Vacancy
-                        @else
-                            Дар бораи ҷои корӣ
-                        @endif
-                    </h5>
-                    <p class="mb-1">
-                        <strong>
-                            @if(session()->get('lang') == 'ru')
+            {{-- Инфо о вакансии --}}
+            <div class="mt-8 p-6 rounded-2xl" style="background: var(--dark-card); border: 1px solid var(--dark-border);">
+                <h3 class="text-sm font-semibold uppercase tracking-wider mb-4" style="color: var(--gold);">
+                    @if (session()->get('lang') == 'ru')
+                        О вакансии
+                    @elseif(session()->get('lang') == 'en')
+                        About Vacancy
+                    @else
+                        Дар бораи ҷои корӣ
+                    @endif
+                </h3>
+                <div class="space-y-2 text-sm">
+                    <div class="flex justify-between">
+                        <span class="text-gray-500">
+                            @if (session()->get('lang') == 'ru')
                                 Позиция
                             @elseif(session()->get('lang') == 'en')
                                 Position
                             @else
                                 Мақом
-                            @endif:
-                        </strong> {{ $job->{'title_'.app()->getLocale()} }}
-                    </p>
-                    @if($job->location)
-                        <p class="mb-1">
-                            <strong>
-                                @if(session()->get('lang') == 'ru')
-                                    Местоположение
+                            @endif
+                        </span>
+                        <span class="text-gray-300">
+
+                            @if (session()->get('lang') == 'ru')
+                                {{ $job->title_ru }}
+                            @elseif(session()->get('lang') == 'en')
+                                {{ $job->title_en }}
+                            @else
+                                {{ $job->title_tj }}
+                            @endif
+                        </span>
+                    </div>
+                    @if ($job->location)
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">
+                                @if (session()->get('lang') == 'ru')
+                                    Место
                                 @elseif(session()->get('lang') == 'en')
                                     Location
                                 @else
-                                    Ҷойгиршавӣ
-                                @endif:
-                            </strong> {{ $job->location }}
-                        </p>
+                                    Ҷой
+                                @endif
+                            </span>
+                            <span class="text-gray-300">{{ $job->location }}</span>
+                        </div>
                     @endif
-                    @if($job->salary)
-                        <p class="mb-1">
-                            <strong>
-                                @if(session()->get('lang') == 'ru')
+                    @if ($job->salary)
+                        <div class="flex justify-between">
+                            <span class="text-gray-500">
+                                @if (session()->get('lang') == 'ru')
                                     Зарплата
                                 @elseif(session()->get('lang') == 'en')
                                     Salary
                                 @else
-                                    Музди меҳнат
-                                @endif:
-                            </strong> {{ $job->salary }}
-                        </p>
+                                    Музд
+                                @endif
+                            </span>
+                            <span style="color: var(--gold);">{{ $job->salary }}</span>
+                        </div>
                     @endif
                 </div>
             </div>
         </div>
-    </div>
-</div>
-
-<style>
-    .form-label {
-        font-weight: 600;
-    }
-    .card {
-        border-radius: 10px;
-    }
-    .card-header {
-        border-radius: 10px 10px 0 0 !important;
-    }
-</style>
-
-<script>
-document.getElementById('jobApplicationForm').addEventListener('submit', function(e) {
-    const submitBtn = this.querySelector('button[type="submit"]');
-    submitBtn.disabled = true;
-    
-    const lang = '{{ session()->get("lang") ?? "tj" }}';
-    let loadingText = '';
-    if (lang === 'ru') {
-        loadingText = '<i class="fas fa-spinner fa-spin"></i> Отправка...';
-    } else if (lang === 'en') {
-        loadingText = '<i class="fas fa-spinner fa-spin"></i> Submitting...';
-    } else {
-        loadingText = '<i class="fas fa-spinner fa-spin"></i> Фиристода мешавад...';
-    }
-    
-    submitBtn.innerHTML = loadingText;
-});
-</script>
+    </section>
 @endsection
+
+@push('scripts')
+    <script>
+        document.getElementById('jobApplicationForm').addEventListener('submit', function(e) {
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
+            btn.innerHTML =
+                '<svg class="animate-spin inline w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>@if (session()->get('lang') == 'ru')Отправка...@elseif (session()->get('lang') == 'en')Submitting...@elseФиристода мешавад...@endif';
+        });
+    </script>
+@endpush

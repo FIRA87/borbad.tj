@@ -1,6 +1,7 @@
 @extends('frontend.master')
+
 @section('title')
-    @if (session()->get('lang') == 'ru')
+    @if(session()->get('lang') == 'ru')
         {{ $project->title_ru }}
     @elseif(session()->get('lang') == 'en')
         {{ $project->title_en }}
@@ -9,337 +10,246 @@
     @endif
 @endsection
 
-@section('content')
-<!-- Banner Start -->
-<section class="custom-banner">
-    <div class="container">
-        <div class="custom-banner-content">          
-           <h1 class="mb-4 fw-bold text-left " >
-            @if (session()->get('lang') == 'ru')
-                {{ $project->title_ru }}
-            @elseif(session()->get('lang') == 'en')
-                {{ $project->title_en }}
-            @else
-                {{ $project->title_tj }}
-            @endif
-        </h1>
-        </div>
-    </div>
-</section>
-<!-- Banner End -->
-
-<!-- Кнопка "Назад" -->
-<section class="py-3 bg-light">
-    <div class="container">
-        <a href="{{ route('frontend.projects') }}" class="text-decoration-none text-dark d-inline-flex align-items-center">
-            <i class="bi bi-arrow-left me-2"></i> @trans('our_projects')  </a>
-    </div>
-</section>
-
-<div class="container py-5">   
-    <!-- Основное изображение -->
-   <div class="row">
-    <div class="col-md-12">
-         @if($project->image)
-        <img src="/{{ $project->image }}" class="img-fluid rounded shadow-sm mb-4" alt="{{ $project->title_tj }}">
-    @endif
-     </div>
-   </div>
-
-    <!-- Даты проекта -->
-    @if($project->start_date || $project->end_date)
-        <div class="project-dates mb-4">
-            <div class="row g-3">
-                @if($project->start_date)
-                    <div class="col-md-6">
-                        <div class="date-card">
-                            <div class="date-icon">
-                                <i class="bi bi-calendar-check"></i>
-                            </div>
-                            <div class="date-content">
-                                <h6 class="date-label text-white">
-                                    @if (session()->get('lang') == 'ru')
-                                        Дата начала
-                                    @elseif(session()->get('lang') == 'en')
-                                        Start Date
-                                    @else
-                                        Санаи оғоз
-                                    @endif
-                                </h6>
-                                <p class="date-value">{{ \Carbon\Carbon::parse($project->start_date)->format('d.m.Y') }}</p>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-                
-                @if($project->end_date)
-                    <div class="col-md-6">
-                        <div class="date-card">
-                            <div class="date-icon">
-                                <i class="bi bi-calendar-x"></i>
-                            </div>
-                            <div class="date-content">
-                                <h6 class="date-label text-white">
-                                    @if (session()->get('lang') == 'ru')
-                                        Дата окончания
-                                    @elseif(session()->get('lang') == 'en')
-                                        End Date
-                                    @else
-                                        Санаи анҷом
-                                    @endif
-                                </h6>
-                                <p class="date-value">{{ \Carbon\Carbon::parse($project->end_date)->format('d.m.Y') }}</p>
-                            </div>
-                        </div>
-                    </div>
-                @endif
-            </div>
-        </div>
-    @endif
- 
-    <!-- Текст проекта -->
-    <div class="project-text mb-5" style="font-size: 18px; line-height: 1.8;">
-        @if (session()->get('lang') == 'ru')
-            {!! $project->text_ru !!}
-        @elseif(session()->get('lang') == 'en')
-            {!! $project->text_en !!}
-        @else
-            {!! $project->text_tj !!}
-        @endif
-    </div>
-
-    <!-- Галерея изображений -->
-    @if($project->gallery)
-        @php
-            // Проверяем тип данных и обрабатываем соответственно
-            if (is_string($project->gallery)) {
-                $galleryImages = json_decode($project->gallery, true);
-            } else {
-                $galleryImages = $project->gallery;
-            }
-        @endphp
-        
-        @if(is_array($galleryImages) && count($galleryImages) > 0)
-            <div class="project-gallery">
-                <h3 class="mb-4 fw-bold">
-                    @if (session()->get('lang') == 'ru')
-                        Галерея проекта
-                    @elseif(session()->get('lang') == 'en')
-                        Project Gallery
-                    @else
-                        Галереяи лоиҳа
-                    @endif
-                </h3>
-                
-                <div class="row g-3">
-                    @foreach($galleryImages as $index => $image)
-                        <div class="col-lg-4 col-md-6 col-sm-6">
-                            <div class="gallery-item">
-                                <a href="{{ asset($image) }}" 
-                                   data-lightbox="project-gallery" 
-                                   data-title="@if (session()->get('lang') == 'ru'){{ $project->title_ru }}@elseif(session()->get('lang') == 'en'){{ $project->title_en }}@else{{ $project->title_tj }}@endif - Фото {{ $index + 1 }}">
-                                    <img src="{{ asset($image) }}" 
-                                         class="img-fluid rounded shadow-sm" 
-                                         alt="Gallery Image {{ $index + 1 }}"
-                                         loading="lazy">
-                                    <div class="gallery-overlay">
-                                        <i class="bi bi-zoom-in"></i>
-                                    </div>
-                                </a>
-                            </div>
-                        </div>
-                    @endforeach
-                </div>
-            </div>
-        @endif
-    @endif
-</div>
-
-<style>
-    /* ==== Modern Banner ==== */
-    .custom-banner {
-        background: #f7f9fc;
-        padding: 60px 0;
-        border-bottom: 1px solid #e4e7eb;
-    }
-    .custom-banner-content {
-        text-align: left;
-        animation: fadeIn 0.8s ease-in-out;
-    }
-
-    /* ==== Date Cards ==== */
-    .project-dates {
-        margin-bottom: 30px;
-    }
-
-    .date-card {
-        display: flex;
-        align-items: center;
-        gap: 20px;
-        padding: 20px 25px;
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border-radius: 12px;
-        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .date-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-    }
-
-    .date-icon {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 60px;
-        height: 60px;
-        background: rgba(255, 255, 255, 0.2);
-        border-radius: 50%;
-        flex-shrink: 0;
-    }
-
-    .date-icon i {
-        font-size: 28px;
-        color: #fff;
-    }
-
-    .date-content {
-        flex: 1;
-    }
-
-    .date-label {
-        font-size: 14px;
-        font-weight: 500;
-        color: rgba(255, 255, 255, 0.9);
-        margin: 0 0 5px 0;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-    }
-
-    .date-value {
-        font-size: 22px;
-        font-weight: 700;
-        color: #fff;
-        margin: 0;
-    }
-
-    /* ==== Gallery Styles ==== */
-    .project-gallery {
-        margin-top: 50px;
-    }
-
-    .gallery-item {
-        position: relative;
-        overflow: hidden;
-        border-radius: 10px;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-        cursor: pointer;
-    }
-
-    .gallery-item:hover {
-        transform: translateY(-8px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-    }
-
-    .gallery-item img {
-        width: 100%;
-        height: 280px;
-        object-fit: cover;
-        display: block;
-        transition: transform 0.4s ease;
-    }
-
-    .gallery-item:hover img {
-        transform: scale(1.15);
-    }
-
-    .gallery-overlay {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: linear-gradient(135deg, rgba(0, 112, 201, 0.8), rgba(0, 74, 136, 0.8));
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        opacity: 0;
-        transition: opacity 0.3s ease;
-    }
-
-    .gallery-item:hover .gallery-overlay {
-        opacity: 1;
-    }
-
-    .gallery-overlay i {
-        color: #fff;
-        font-size: 40px;
-        animation: zoomPulse 0.6s ease-in-out;
-    }
-
-    @keyframes zoomPulse {
-        0%, 100% { transform: scale(1); }
-        50% { transform: scale(1.2); }
-    }
-
-    /* Fade animation */
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-
-    /* ==== Mobile ==== */
-    @media (max-width: 768px) {
-        .custom-banner {
-            padding: 40px 0;
+@push('styles')
+    <style>
+        .date-badge {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 12px;
+            padding: 20px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            transition: all 0.3s ease;
         }
-        .gallery-item img {
+
+        .date-badge:hover {
+            border-color: var(--gold);
+        }
+
+        .date-badge-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: var(--gold-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .project-body img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+        }
+
+        .project-body p {
+            margin-bottom: 1.2rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .project-gallery-item {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            border: 1px solid var(--dark-border);
+            cursor: pointer;
+            transition: all 0.4s ease;
+        }
+
+        .project-gallery-item:hover {
+            transform: scale(1.03);
+            border-color: var(--gold);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .project-gallery-item img {
+            width: 100%;
             height: 220px;
+            object-fit: cover;
+            display: block;
         }
-        .date-card {
-            padding: 15px 20px;
-        }
-        .date-icon {
-            width: 50px;
-            height: 50px;
-        }
-        .date-icon i {
-            font-size: 24px;
-        }
-        .date-value {
-            font-size: 18px;
-        }
-    }
 
-    @media (max-width: 576px) {
-        .custom-banner {
-            padding: 35px 0;
+        .project-gallery-item::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, transparent 50%, rgba(0, 0, 0, 0.6) 100%);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
-        .gallery-item img {
-            height: 200px;
+
+        .project-gallery-item:hover::after {
+            opacity: 1;
         }
-        .gallery-overlay i {
-            font-size: 32px;
+
+        /* Лайтбокс */
+        .project-lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9998;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
         }
-    }
-</style>
 
-<!-- Lightbox библиотека для просмотра изображений -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+        .project-lightbox.active {
+            opacity: 1;
+            pointer-events: all;
+        }
 
-<script>
-    // Настройки Lightbox
-    lightbox.option({
-        'resizeDuration': 200,
-        'wrapAround': true,
-        'albumLabel': "Изображение %1 из %2",
-        'fadeDuration': 300,
-        'imageFadeDuration': 300
-    });
-</script>
+        .project-lightbox img {
+            max-width: 90vw;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 12px;
+        }
+    </style>
+@endpush
 
+@section('content')
+    {{-- Заголовок --}}
+    <section class="pt-16 pb-12 px-6" style="background: var(--dark-surface); border-bottom: 1px solid var(--dark-border);">
+        <div class="max-w-4xl mx-auto">
+            {{-- Кнопка назад --}}
+            <a href="{{ route('frontend.projects') }}" class="inline-flex items-center text-sm mb-6 transition-colors"
+                style="color: var(--gold);">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                @trans('our_projects')
+            </a>
+
+            <h1 class="display-font text-3xl md:text-4xl font-bold text-white mb-4 leading-tight">
+                @if(session()->get('lang') == 'ru') {{ $project->title_ru }}
+                @elseif(session()->get('lang') == 'en') {{ $project->title_en }}
+                @else {{ $project->title_tj }} @endif
+            </h1>
+
+            @php
+                $isActive = $project->end_date ? \Carbon\Carbon::now()->lessThanOrEqualTo($project->end_date) : true;
+            @endphp
+            <span class="inline-block px-3 py-1 rounded-lg text-xs font-semibold"
+                style="background: {{ $isActive ? 'rgba(34, 197, 94, 0.15)' : 'rgba(156, 163, 175, 0.15)' }};
+                    color: {{ $isActive ? '#22c55e' : '#9ca3af' }};">
+                @if($isActive)
+                    @if(session()->get('lang') == 'ru') Активный @elseif(session()->get('lang') == 'en') Active @else Фаъол @endif
+                @else
+                    @if(session()->get('lang') == 'ru') Завершён @elseif(session()->get('lang') == 'en') Completed @else Анҷомёфта @endif
+                @endif
+            </span>
+        </div>
+    </section>
+
+    {{-- Контент --}}
+    <section class="py-16 px-6">
+        <div class="max-w-4xl mx-auto">
+            {{-- Изображение --}}
+            @if($project->image)
+                <div class="mb-10 rounded-2xl overflow-hidden border" style="border-color: var(--dark-border);">
+                    <img src="/{{ $project->image }}" class="w-full" style="max-height: 500px; object-fit: cover;"
+                        alt="{{ $project->title_tj }}">
+                </div>
+            @endif
+
+            {{-- Даты проекта --}}
+            @if($project->start_date || $project->end_date)
+                <div class="grid md:grid-cols-2 gap-4 mb-10">
+                    @if($project->start_date)
+                        <div class="date-badge">
+                            <div class="date-badge-icon">
+                                <svg class="w-5 h-5" style="color: var(--gold);" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-xs uppercase tracking-wider mb-1" style="color: var(--text-muted);">
+                                    @if(session()->get('lang') == 'ru') Дата начала @elseif(session()->get('lang') == 'en') Start Date @else Санаи оғоз @endif
+                                </p>
+                                <p class="text-white text-lg font-bold">{{ \Carbon\Carbon::parse($project->start_date)->format('d.m.Y') }}</p>
+                            </div>
+                        </div>
+                    @endif
+                    @if($project->end_date)
+                        <div class="date-badge">
+                            <div class="date-badge-icon">
+                                <svg class="w-5 h-5" style="color: var(--gold);" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div>
+                                <p class="text-xs uppercase tracking-wider mb-1" style="color: var(--text-muted);">
+                                    @if(session()->get('lang') == 'ru') Дата окончания @elseif(session()->get('lang') == 'en') End Date @else Санаи анҷом @endif
+                                </p>
+                                <p class="text-white text-lg font-bold">{{ \Carbon\Carbon::parse($project->end_date)->format('d.m.Y') }}</p>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+            @endif
+
+            {{-- Текст --}}
+            <div class="project-body text-lg leading-relaxed mb-12">
+                @if(session()->get('lang') == 'ru') {!! $project->text_ru !!}
+                @elseif(session()->get('lang') == 'en') {!! $project->text_en !!}
+                @else {!! $project->text_tj !!} @endif
+            </div>
+
+            {{-- Галерея --}}
+            @if($project->gallery)
+                @php
+                    $galleryImages = is_string($project->gallery) ? json_decode($project->gallery, true) : $project->gallery;
+                @endphp
+
+                @if(is_array($galleryImages) && count($galleryImages) > 0)
+                    <div class="mt-12">
+                        <h3 class="display-font text-2xl font-bold text-white mb-6">
+                            @if(session()->get('lang') == 'ru') Галерея проекта
+                            @elseif(session()->get('lang') == 'en') Project Gallery
+                            @else Галереяи лоиҳа @endif
+                        </h3>
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                            @foreach($galleryImages as $image)
+                                <div class="project-gallery-item" onclick="openProjectLightbox('{{ asset($image) }}')">
+                                    <img src="{{ asset($image) }}" alt="Gallery" loading="lazy">
+                                </div>
+                            @endforeach
+                        </div>
+                    </div>
+                @endif
+            @endif
+        </div>
+    </section>
+
+    {{-- Лайтбокс --}}
+    <div class="project-lightbox" id="projectLightbox" onclick="closeProjectLightbox()">
+        <button class="absolute top-6 right-6 text-white text-4xl hover:scale-110 transition-transform">&times;</button>
+        <img id="projectLightboxImg" src="" alt="Фото">
+    </div>
 @endsection
+
+@push('scripts')
+    <script>
+        function openProjectLightbox(src) {
+            document.getElementById('projectLightboxImg').src = src;
+            document.getElementById('projectLightbox').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeProjectLightbox() {
+            document.getElementById('projectLightbox').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeProjectLightbox();
+        });
+    </script>
+@endpush

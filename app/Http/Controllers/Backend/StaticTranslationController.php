@@ -23,7 +23,7 @@ class StaticTranslationController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
+        $data = $request->validate([
             'key' => 'required|unique:static_translations,key',
             'value_ru' => 'required',
             'value_en' => 'required',
@@ -32,7 +32,7 @@ class StaticTranslationController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        StaticTranslation::create($request->all());
+        StaticTranslation::create($data);
 
         return redirect()->route('static-translations.index')->with('success', 'Перевод добавлен');
     }
@@ -47,7 +47,7 @@ class StaticTranslationController extends Controller
     {
         $translation = StaticTranslation::findOrFail($id);
 
-        $request->validate([
+        $data = $request->validate([
             'key' => 'required|unique:static_translations,key,' . $id,
             'value_ru' => 'required',
             'value_en' => 'required',
@@ -56,7 +56,7 @@ class StaticTranslationController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        $translation->update($request->all());
+        $translation->update($data);
 
         return redirect()->route('static-translations.index')->with('success', 'Перевод обновлен');
     }

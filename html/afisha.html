@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Афиша - Борбад</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --burgundy-deep: #5C0A0A;
+            --burgundy-main: #8B1538;
+            --burgundy-light: #B8264D;
+            --gold: #D4AF37;
+            --gold-light: #F4E5B8;
+            --cream: #FFF8F0;
+            --charcoal: #1A1A1A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: var(--cream);
+            color: var(--charcoal);
+        }
+
+        .display-font {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--burgundy-main), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-link {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--gold);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            transform: translateX(0);
+        }
+
+        .decorative-line {
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--burgundy-main), var(--gold));
+            margin: 1rem auto;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+        .delay-400 { animation-delay: 0.4s; }
+
+        .event-card {
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .event-card:hover {
+            transform: translateX(8px);
+            box-shadow: -4px 4px 0 var(--gold);
+        }
+
+        .filter-btn {
+            transition: all 0.3s ease;
+            border: 2px solid var(--burgundy-main);
+            color: var(--burgundy-main);
+        }
+
+        .filter-btn.active {
+            background: var(--burgundy-main);
+            color: white;
+        }
+
+        .filter-btn:hover {
+            background: var(--burgundy-light);
+            color: white;
+            border-color: var(--burgundy-light);
+        }
+
+        .texture-overlay {
+            position: relative;
+        }
+
+        .texture-overlay::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="display-font text-3xl font-bold gradient-text">
+                    Борбад
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="nav-link text-lg font-medium text-gray-800 hover:text-burgundy-main pb-1">Главная</a>
+                    <a href="afisha.html" class="nav-link text-lg font-medium text-gray-800 hover:text-burgundy-main pb-1">Афиша</a>
+                    <a href="about.html" class="nav-link text-lg font-medium text-gray-800 hover:text-burgundy-main pb-1">О нас</a>
+                    <a href="gallery.html" class="nav-link text-lg font-medium text-gray-800 hover:text-burgundy-main pb-1">Галерея</a>
+                    <a href="contacts.html" class="nav-link text-lg font-medium text-gray-800 hover:text-burgundy-main pb-1">Контакты</a>
+                </div>
+
+                <button class="md:hidden text-gray-800" id="mobileMenuBtn">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="hidden md:hidden mt-4 pb-4" id="mobileMenu">
+                <a href="index.html" class="block py-2 text-lg font-medium text-gray-800 hover:text-burgundy-main">Главная</a>
+                <a href="afisha.html" class="block py-2 text-lg font-medium text-gray-800 hover:text-burgundy-main">Афиша</a>
+                <a href="about.html" class="block py-2 text-lg font-medium text-gray-800 hover:text-burgundy-main">О нас</a>
+                <a href="gallery.html" class="block py-2 text-lg font-medium text-gray-800 hover:text-burgundy-main">Галерея</a>
+                <a href="contacts.html" class="block py-2 text-lg font-medium text-gray-800 hover:text-burgundy-main">Контакты</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <section class="pt-32 pb-16 px-6 texture-overlay" style="background: linear-gradient(135deg, #FFF8F0 0%, #F4E5B8 100%);">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="display-font text-6xl md:text-7xl font-black mb-6 fade-in-up" style="color: var(--burgundy-deep);">
+                Афиша
+            </h1>
+            <div class="decorative-line delay-100 fade-in-up"></div>
+            <p class="text-2xl text-gray-700 mt-6 fade-in-up delay-200">
+                Предстоящие события и мероприятия
+            </p>
+        </div>
+    </section>
+
+    <!-- Filter Section -->
+    <section class="py-8 px-6 bg-white shadow-md">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-wrap gap-4 justify-center">
+                <button class="filter-btn active px-6 py-2 rounded-full font-semibold text-lg" data-filter="all">
+                    Все события
+                </button>
+                <button class="filter-btn px-6 py-2 rounded-full font-semibold text-lg" data-filter="concert">
+                    Концерты
+                </button>
+                <button class="filter-btn px-6 py-2 rounded-full font-semibold text-lg" data-filter="theater">
+                    Театр
+                </button>
+                <button class="filter-btn px-6 py-2 rounded-full font-semibold text-lg" data-filter="festival">
+                    Фестивали
+                </button>
+                <button class="filter-btn px-6 py-2 rounded-full font-semibold text-lg" data-filter="other">
+                    Другое
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Events List -->
+    <section class="py-16 px-6">
+        <div class="max-w-6xl mx-auto space-y-6">
+            <!-- Event Item 1 -->
+            <div class="event-card bg-white rounded-xl shadow-lg overflow-hidden border-l-8" style="border-color: var(--gold);" data-category="concert">
+                <div class="flex flex-col md:flex-row">
+                    <div class="md:w-48 p-6 flex flex-col items-center justify-center" style="background: linear-gradient(135deg, var(--burgundy-main), var(--burgundy-deep));">
+                        <div class="text-center text-white">
+                            <p class="text-5xl font-bold">15</p>
+                            <p class="text-xl mt-2">Февраля</p>
+                            <p class="text-sm mt-1 opacity-80">Суббота</p>
+                        </div>
+                    </div>
+                    <div class="flex-1 p-6">
+                        <div class="flex items-start justify-between mb-3">
+                            <h3 class="display-font text-3xl font-bold" style="color: var(--burgundy-deep);">
+                                Вечер классической музыки
+                            </h3>
+                            <span class="px-4 py-1 rounded-full text-sm font-semibold" style="background: var(--gold-light); color: var(--burgundy-deep);">
+                                Концерт
+                            </span>
+                        </div>
+                        <p class="text-lg text-gray-700 mb-4 leading-relaxed">
+                            Симфонический оркестр представляет лучшие произведения мировой классики. В программе: Чайковский, Моцарт, Бетховен.
+                        </p>
+                        <div class="flex flex-wrap gap-4 text-gray-600">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" style="color: var(--burgundy-main);" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>19:00</span>
+                            </div>
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" style="color: var(--burgundy-main);" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Главный зал</span>
+                            </div>
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" style="color: var(--burgundy-main);" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
+                                    <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z"/>
+                                </svg>
+                                <span>500 мест</span>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex gap-4">
+                            <button class="px-6 py-2 rounded-full font-semibold transition-all" style="background: var(--burgundy-main); color: white;">
+                                Купить билет
+                            </button>
+                            <button class="px-6 py-2 rounded-full font-semibold border-2 transition-all hover:bg-gray-50" style="color: var(--burgundy-main); border-color: var(--burgundy-main);">
+                                Подробнее
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event Item 2 -->
+            <div class="event-card bg-white rounded-xl shadow-lg overflow-hidden border-l-8" style="border-color: var(--gold);" data-category="theater">
+                <div class="flex flex-col md:flex-row">
+                    <div class="md:w-48 p-6 flex flex-col items-center justify-center" style="background: linear-gradient(135deg, var(--burgundy-light), var(--burgundy-main));">
+                        <div class="text-center text-white">
+                            <p class="text-5xl font-bold">20</p>
+                            <p class="text-xl mt-2">Февраля</p>
+                            <p class="text-sm mt-1 opacity-80">Четверг</p>
+                        </div>
+                    </div>
+                    <div class="flex-1 p-6">
+                        <div class="flex items-start justify-between mb-3">
+                            <h3 class="display-font text-3xl font-bold" style="color: var(--burgundy-deep);">
+                                Театральная премьера "Ромео и Джульетта"
+                            </h3>
+                            <span class="px-4 py-1 rounded-full text-sm font-semibold" style="background: var(--gold-light); color: var(--burgundy-deep);">
+                                Театр
+                            </span>
+                        </div>
+                        <p class="text-lg text-gray-700 mb-4 leading-relaxed">
+                            Премьера драматического спектакля от национального театра. Бессмертная классика Шекспира в новом прочтении.
+                        </p>
+                        <div class="flex flex-wrap gap-4 text-gray-600">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" style="color: var(--burgundy-main);" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>18:30</span>
+                            </div>
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" style="color: var(--burgundy-main);" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Главный зал</span>
+                            </div>
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" style="color: var(--burgundy-main);" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
+                                    <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z"/>
+                                </svg>
+                                <span>450 мест</span>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex gap-4">
+                            <button class="px-6 py-2 rounded-full font-semibold transition-all" style="background: var(--burgundy-main); color: white;">
+                                Купить билет
+                            </button>
+                            <button class="px-6 py-2 rounded-full font-semibold border-2 transition-all hover:bg-gray-50" style="color: var(--burgundy-main); border-color: var(--burgundy-main);">
+                                Подробнее
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event Item 3 -->
+            <div class="event-card bg-white rounded-xl shadow-lg overflow-hidden border-l-8" style="border-color: var(--gold);" data-category="festival">
+                <div class="flex flex-col md:flex-row">
+                    <div class="md:w-48 p-6 flex flex-col items-center justify-center" style="background: linear-gradient(135deg, #D4AF37, #8B1538);">
+                        <div class="text-center text-white">
+                            <p class="text-5xl font-bold">25</p>
+                            <p class="text-xl mt-2">Февраля</p>
+                            <p class="text-sm mt-1 opacity-80">Вторник</p>
+                        </div>
+                    </div>
+                    <div class="flex-1 p-6">
+                        <div class="flex items-start justify-between mb-3">
+                            <h3 class="display-font text-3xl font-bold" style="color: var(--burgundy-deep);">
+                                Фестиваль народной музыки
+                            </h3>
+                            <span class="px-4 py-1 rounded-full text-sm font-semibold" style="background: var(--gold-light); color: var(--burgundy-deep);">
+                                Фестиваль
+                            </span>
+                        </div>
+                        <p class="text-lg text-gray-700 mb-4 leading-relaxed">
+                            Традиционная музыка и танцы в исполнении народных коллективов. Празднование культурного наследия Таджикистана.
+                        </p>
+                        <div class="flex flex-wrap gap-4 text-gray-600">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" style="color: var(--burgundy-main);" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>17:00</span>
+                            </div>
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" style="color: var(--burgundy-main);" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Главный зал</span>
+                            </div>
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" style="color: var(--burgundy-main);" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
+                                    <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z"/>
+                                </svg>
+                                <span>500 мест</span>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex gap-4">
+                            <button class="px-6 py-2 rounded-full font-semibold transition-all" style="background: var(--burgundy-main); color: white;">
+                                Купить билет
+                            </button>
+                            <button class="px-6 py-2 rounded-full font-semibold border-2 transition-all hover:bg-gray-50" style="color: var(--burgundy-main); border-color: var(--burgundy-main);">
+                                Подробнее
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Event Item 4 -->
+            <div class="event-card bg-white rounded-xl shadow-lg overflow-hidden border-l-8" style="border-color: var(--gold);" data-category="concert">
+                <div class="flex flex-col md:flex-row">
+                    <div class="md:w-48 p-6 flex flex-col items-center justify-center" style="background: linear-gradient(135deg, var(--burgundy-main), var(--burgundy-deep));">
+                        <div class="text-center text-white">
+                            <p class="text-5xl font-bold">28</p>
+                            <p class="text-xl mt-2">Февраля</p>
+                            <p class="text-sm mt-1 opacity-80">Пятница</p>
+                        </div>
+                    </div>
+                    <div class="flex-1 p-6">
+                        <div class="flex items-start justify-between mb-3">
+                            <h3 class="display-font text-3xl font-bold" style="color: var(--burgundy-deep);">
+                                Джазовый вечер
+                            </h3>
+                            <span class="px-4 py-1 rounded-full text-sm font-semibold" style="background: var(--gold-light); color: var(--burgundy-deep);">
+                                Концерт
+                            </span>
+                        </div>
+                        <p class="text-lg text-gray-700 mb-4 leading-relaxed">
+                            Выступление известного джаз-квартета. Атмосферный вечер в стиле американского джаза 50-х годов.
+                        </p>
+                        <div class="flex flex-wrap gap-4 text-gray-600">
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" style="color: var(--burgundy-main);" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>20:00</span>
+                            </div>
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" style="color: var(--burgundy-main);" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd"/>
+                                </svg>
+                                <span>Камерный зал</span>
+                            </div>
+                            <div class="flex items-center">
+                                <svg class="w-5 h-5 mr-2" style="color: var(--burgundy-main);" fill="currentColor" viewBox="0 0 20 20">
+                                    <path d="M8 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM15 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0z"/>
+                                    <path d="M3 4a1 1 0 00-1 1v10a1 1 0 001 1h1.05a2.5 2.5 0 014.9 0H10a1 1 0 001-1V5a1 1 0 00-1-1H3zM14 7a1 1 0 00-1 1v6.05A2.5 2.5 0 0115.95 16H17a1 1 0 001-1v-5a1 1 0 00-.293-.707l-2-2A1 1 0 0015 7h-1z"/>
+                                </svg>
+                                <span>200 мест</span>
+                            </div>
+                        </div>
+                        <div class="mt-6 flex gap-4">
+                            <button class="px-6 py-2 rounded-full font-semibold transition-all" style="background: var(--burgundy-main); color: white;">
+                                Купить билет
+                            </button>
+                            <button class="px-6 py-2 rounded-full font-semibold border-2 transition-all hover:bg-gray-50" style="color: var(--burgundy-main); border-color: var(--burgundy-main);">
+                                Подробнее
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6 texture-overlay" style="background: linear-gradient(135deg, var(--burgundy-deep), var(--burgundy-main));">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="display-font text-2xl font-bold mb-4" style="color: var(--gold);">Борбад</h3>
+                    <p class="text-gray-300 text-lg">
+                        Театрально-концертный зал
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-lg" style="color: var(--gold-light);">Навигация</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-300 hover:text-white transition">Главная</a></li>
+                        <li><a href="afisha.html" class="text-gray-300 hover:text-white transition">Афиша</a></li>
+                        <li><a href="about.html" class="text-gray-300 hover:text-white transition">О нас</a></li>
+                        <li><a href="gallery.html" class="text-gray-300 hover:text-white transition">Галерея</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-lg" style="color: var(--gold-light);">Контакты</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li>г. Душанбе, Таджикистан</li>
+                        <li>Тел: +992 XX XXX XXXX</li>
+                        <li>Email: info@borbad.tj</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-lg" style="color: var(--gold-light);">Режим работы</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li>Пн-Пт: 10:00 - 20:00</li>
+                        <li>Сб-Вс: 12:00 - 21:00</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t pt-6" style="border-color: rgba(212, 175, 55, 0.3);">
+                <p class="text-center text-gray-400">
+                    &copy; 2026 Борбад. Все права защищены.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+
+        // Filter functionality
+        const filterBtns = document.querySelectorAll('.filter-btn');
+        const eventCards = document.querySelectorAll('.event-card');
+
+        filterBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Update active state
+                filterBtns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+
+                const filter = btn.dataset.filter;
+
+                // Filter events
+                eventCards.forEach(card => {
+                    if (filter === 'all' || card.dataset.category === filter) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

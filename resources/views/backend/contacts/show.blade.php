@@ -10,6 +10,7 @@
     <p><strong>Имя:</strong> {{ $contact->title_ru }}</p>
     <p><strong>Email:</strong> {{ $contact->email ?? '-' }}</p>
     <p><strong>Телефон:</strong> {{ $contact->phone ?? '-' }}</p>
+    <p><strong>Тема обращения:</strong> {{ $contact->subject_label }}</p>
     <p><strong>Сообщение:</strong></p>
     <div class="border p-3 bg-light">{{ $contact->message_ru }}</div>
     <a href="{{ route('contacts.index') }}" class="btn btn-secondary mt-3">Назад</a>

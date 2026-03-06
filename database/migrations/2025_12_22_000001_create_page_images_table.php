@@ -8,9 +8,14 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * Пропускаем создание, если таблица уже существует.
      */
     public function up(): void
     {
+        if (Schema::hasTable('page_images')) {
+            return;
+        }
+
         Schema::create('page_images', function (Blueprint $table) {
             $table->id();
             $table->morphs('imageable'); // Creates imageable_type and imageable_id

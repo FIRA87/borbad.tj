@@ -10,501 +10,346 @@
     @endif
 @endsection
 
+@push('styles')
+    <style>
+        .news-body img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+        }
+
+        .news-body p {
+            margin-bottom: 1.2rem;
+            line-height: 1.8;
+            color: var(--text-secondary);
+        }
+
+        .news-body h2,
+        .news-body h3 {
+            color: var(--text-primary);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* Карусель галереи */
+        .gallery-carousel {
+            position: relative;
+            overflow: hidden;
+            border-radius: 16px;
+            border: 1px solid var(--dark-border);
+        }
+
+        .gallery-carousel img {
+            width: 100%;
+            max-height: 500px;
+            object-fit: contain;
+            background: var(--dark-surface);
+            cursor: pointer;
+        }
+
+        .carousel-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(15, 14, 12, 0.8);
+            border: 1px solid var(--dark-border);
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            z-index: 5;
+        }
+
+        .carousel-nav-btn:hover {
+            background: var(--gold);
+            color: var(--dark-bg);
+        }
+
+        .carousel-nav-btn.prev { left: 12px; }
+        .carousel-nav-btn.next { right: 12px; }
+
+        .gallery-thumbs {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 8px 0;
+        }
+
+        .gallery-thumbs img {
+            width: 80px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 8px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            opacity: 0.6;
+            transition: all 0.3s;
+        }
+
+        .gallery-thumbs img:hover,
+        .gallery-thumbs img.active {
+            border-color: var(--gold);
+            opacity: 1;
+        }
+
+        /* Похожие новости */
+        .related-card {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 16px;
+            overflow: hidden;
+            transition: all 0.4s ease;
+        }
+
+        .related-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--gold);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .related-card img {
+            transition: transform 0.4s ease;
+        }
+
+        .related-card:hover img {
+            transform: scale(1.05);
+        }
+
+        /* Лайтбокс */
+        .news-lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.95);
+            z-index: 9998;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .news-lightbox.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .news-lightbox img {
+            max-width: 90vw;
+            max-height: 85vh;
+            object-fit: contain;
+            border-radius: 12px;
+        }
+    </style>
+@endpush
+
 @section('content')
+    {{-- Заголовок --}}
+    <section class="pt-16 pb-12 px-6" style="background: var(--dark-surface); border-bottom: 1px solid var(--dark-border);">
+        <div class="max-w-4xl mx-auto">
+            {{-- Кнопка назад --}}
+            <a href="{{ route('frontend.news') }}" class="inline-flex items-center text-sm mb-6 transition-colors"
+                style="color: var(--gold);">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                @if(session()->get('lang') == 'ru') Все новости
+                @elseif(session()->get('lang') == 'en') All News
+                @else Ҳамаи хабарҳо @endif
+            </a>
 
-<!-- Кнопка "Назад" -->
-<section class="py-3 bg-light">
-    <div class="container">
-        <a href="{{ route('frontend.news') }}" class="text-decoration-none text-dark d-inline-flex align-items-left">
-            <i class="bi bi-arrow-left me-2"></i>
-            @if(session()->get('lang') == 'ru')
-                Все новости
-            @elseif(session()->get('lang') == 'en')
-                All News
-            @else
-                Ҳамаи хабарҳо
-            @endif
-        </a>
-    </div>
-</section>
+            <h1 class="display-font text-3xl md:text-4xl font-bold mb-4 text-white leading-tight">
+                @if(session()->get('lang') == 'ru') {{ $news->title_ru }}
+                @elseif(session()->get('lang') == 'en') {{ $news->title_en }}
+                @else {{ $news->title_tj }} @endif
+            </h1>
 
-<!-- Основной контент новости -->
-<section class="py-5">
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-12 col-lg-12">
-                
-                <!-- Главное изображение -->
-                @if(!empty($news->image) && $news->image !== '404.jpg')
-                    <div class="mb-4">
-                        <img src="{{ asset($news->image) }}"
-                             class="img-fluid w-100 rounded-3 shadow-sm"
-                             alt="News"
-                             style="max-height: 500px; object-fit: cover;">
-                    </div>
+            <div class="flex items-center gap-4 text-sm" style="color: var(--text-muted);">
+                <span class="flex items-center">
+                    <svg class="w-4 h-4 mr-1.5" style="color: var(--gold);" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z"
+                            clip-rule="evenodd" />
+                    </svg>
+                    {{ \Carbon\Carbon::parse($news->publish_date ?? $news->created_at)->format('d.m.Y') }}
+                </span>
+                @if($news->category)
+                    <span class="px-3 py-1 rounded-lg text-xs font-semibold"
+                        style="background: var(--gold-dim); color: var(--gold);">
+                        @if(session()->get('lang') == 'ru') {{ $news->category->name_ru ?? '' }}
+                        @elseif(session()->get('lang') == 'en') {{ $news->category->name_en ?? '' }}
+                        @else {{ $news->category->name_tj ?? '' }} @endif
+                    </span>
                 @endif
+            </div>
+        </div>
+    </section>
 
-                <!-- Заголовок -->
-                <h1 class="fw-bold mb-4" style="font-size: 1.75rem; line-height: 1.4;">
-                    @if(session()->get('lang') == 'ru')
-                        {{ $news->title_ru }}
-                    @elseif(session()->get('lang') == 'en')
-                        {{ $news->title_en }}
-                    @else
-                        {{ $news->title_tj }}
-                    @endif
-                </h1>
-
-                <!-- Дата публикации -->
-                <p class="text-muted mb-4">
-                    {{ \Carbon\Carbon::parse($news->publish_date ?? $news->created_at)->format('Y-m-d') }}
-                </p>
-
-                <!-- Текст новости -->
-                <div class="news-content mb-5" style="font-size: 1rem; line-height: 1.8; color: #333;">
-                    @if(session()->get('lang') == 'ru')
-                        {!! $news->news_details_ru !!}
-                    @elseif(session()->get('lang') == 'en')
-                        {!! $news->news_details_en !!}
-                    @else
-                        {!! $news->news_details_tj !!}
-                    @endif
+    {{-- Основной контент --}}
+    <section class="py-16 px-6">
+        <div class="max-w-4xl mx-auto">
+            {{-- Главное изображение --}}
+            @if(!empty($news->image) && $news->image !== '404.jpg')
+                <div class="mb-10 rounded-2xl overflow-hidden border" style="border-color: var(--dark-border);">
+                    <img src="{{ asset($news->image) }}" class="w-full" style="max-height: 500px; object-fit: cover;"
+                        alt="News" onclick="openNewsLightbox(this.src)">
                 </div>
+            @endif
 
-                <!-- Галерея дополнительных изображений -->
-                @if($news->images && $news->images->count() > 0)
-                    <div class="mb-5">
-                        <h4 class="fw-bold mb-4">
-                            @if(session()->get('lang') == 'ru')
-                                Фотогалерея
-                            @elseif(session()->get('lang') == 'en')
-                                Photo Gallery
-                            @else
-                                Галереяи аксҳо
-                            @endif
-                        </h4>
+            {{-- Текст новости --}}
+            <div class="news-body text-lg leading-relaxed mb-12">
+                @if(session()->get('lang') == 'ru') {!! $news->news_details_ru !!}
+                @elseif(session()->get('lang') == 'en') {!! $news->news_details_en !!}
+                @else {!! $news->news_details_tj !!} @endif
+            </div>
 
-                        <!-- Карусель Bootstrap -->
-                        <div id="newsGalleryCarousel" class="carousel slide" data-bs-ride="carousel">
-                            <!-- Индикаторы -->
-                            <div class="carousel-indicators">
-                                @foreach($news->images as $index => $image)
-                                    <button type="button" 
-                                            data-bs-target="#newsGalleryCarousel" 
-                                            data-bs-slide-to="{{ $index }}" 
-                                            class="{{ $index === 0 ? 'active' : '' }}"
-                                            aria-label="Slide {{ $index + 1 }}"></button>
-                                @endforeach
-                            </div>
+            {{-- Галерея --}}
+            @if($news->images && $news->images->count() > 0)
+                <div class="mb-12">
+                    <h3 class="display-font text-2xl font-bold text-white mb-6">
+                        @if(session()->get('lang') == 'ru') Фотогалерея
+                        @elseif(session()->get('lang') == 'en') Photo Gallery
+                        @else Галереяи аксҳо @endif
+                    </h3>
 
-                            <!-- Слайды -->
-                            <div class="carousel-inner rounded-3 shadow">
-                                @foreach($news->images as $index => $image)
-                                    <div class="carousel-item {{ $index === 0 ? 'active' : '' }}">
-                                    <img src="{{ asset($image->image) }}" 
-     class="d-block w-100 gallery-image" 
-     alt="Gallery Image {{ $index + 1 }}"
-     style="max-height: 500px; object-fit: contain; background-color: #f8f9fa;"
-     data-bs-toggle="modal"
-     data-bs-target="#imageModal"
-     data-image="{{ asset($image->image) }}">
-                                    </div>
-                                @endforeach
-                            </div>
-
-                            <!-- Кнопки навигации -->
-                            @if($news->images->count() > 1)
-                                <button class="carousel-control-prev" type="button" data-bs-target="#newsGalleryCarousel" data-bs-slide="prev">
-                                    <span class="carousel-control-prev-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Previous</span>
-                                </button>
-                                <button class="carousel-control-next" type="button" data-bs-target="#newsGalleryCarousel" data-bs-slide="next">
-                                    <span class="carousel-control-next-icon bg-dark rounded-circle p-3" aria-hidden="true"></span>
-                                    <span class="visually-hidden">Next</span>
-                                </button>
-                            @endif
-                        </div>
-
-                        <!-- Миниатюры -->
+                    <div class="gallery-carousel mb-4" id="galleryCarousel">
+                        <img id="mainGalleryImg" src="{{ asset($news->images->first()->image) }}" alt="Gallery"
+                            onclick="openNewsLightbox(this.src)">
                         @if($news->images->count() > 1)
-                            <div class="row g-2 mt-3">
-                                @foreach($news->images as $index => $image)
-                                    <div class="col-2 col-md-1-5">
-                                        <img src="{{ asset($image->image) }}" 
-                                             class="img-thumbnail gallery-thumb" 
-                                             alt="Thumbnail {{ $index + 1 }}"
-                                             style="cursor: pointer; height: 80px; object-fit: cover;"
-                                             data-bs-target="#newsGalleryCarousel" 
-                                             data-bs-slide-to="{{ $index }}"
-											 data-image="{{ asset($image->image) }}"
-											 >
-                                    </div>
-                                @endforeach
-                            </div>
+                            <button class="carousel-nav-btn prev" onclick="prevSlide()">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                                </svg>
+                            </button>
+                            <button class="carousel-nav-btn next" onclick="nextSlide()">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </button>
                         @endif
                     </div>
-                @endif
 
-            </div>
-        </div>
-
-<!-- Модальное окно для полноэкранного просмотра -->
-
-<div class="modal fade" id="imageModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered">
-        <div class="modal-content bg-transparent border-0">
-            <div class="modal-body p-0 position-relative">
-                <button type="button" 
-                        class="btn-close btn-close-white position-absolute top-0 end-0 m-3" 
-                        data-bs-dismiss="modal" 
-                        aria-label="Close" 
-                        style="z-index: 1050; opacity: 1; filter: drop-shadow(0 0 3px rgba(0,0,0,0.5));"></button>
-                <img id="modalImage" 
-                     src="" 
-                     class="img-fluid w-100 rounded" 
-                     alt="Full Image"
-                     style="max-height: 90vh; object-fit: contain;">
-            </div>
-        </div>
-    </div>
-</div>
-
-
-<hr>
-        <!-- Другие новости -->
-        @if(isset($related_news) && $related_news->count() > 0)
-            <div class="row justify-content-center mt-5">
-                <div class="col-12 col-lg-12">
-                    
-                    <div class="d-flex justify-content-between align-items-center mb-4">
-                        <h3 class="fw-bold mb-0">
-                            @if(session()->get('lang') == 'ru')
-                                Другие новости
-                            @elseif(session()->get('lang') == 'en')
-                                Other News
-                            @else
-                                Дигар хабарҳо
-                            @endif
-                        </h3>
-                        
-                        <!-- Стрелки навигации -->
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-outline-secondary btn-sm rounded-circle" 
-                                    id="prevBtn" 
-                                    style="width: 36px; height: 36px; padding: 0;">
-                                <i class="bi bi-chevron-left"></i>
-                            </button>
-                            <button class="btn btn-outline-secondary btn-sm rounded-circle" 
-                                    id="nextBtn"
-                                    style="width: 36px; height: 36px; padding: 0;">
-                                <i class="bi bi-chevron-right"></i>
-                            </button>
-                        </div>
-                    </div>
-
-
-
-                    <!-- Карусель новостей -->
-                    <div class="position-relative overflow-hidden">
-                        <div class="news-carousel d-flex gap-3" id="newsCarousel">
-                            @foreach($related_news->take(12) as $item)
-                                <div class="news-item flex-shrink-0" style="width: 280px;">
-                                    <a href="{{ url('news/details/'.$item->id) }}" 
-                                       class="text-decoration-none">
-                                        <div class="card border-0 shadow-sm h-100 hover-card">
-                                            <!-- Изображение -->
-                                            <div class="position-relative overflow-hidden" style="height: 180px;">
-                                                @if(!empty($item->image) && $item->image !== 'no-image.jpg')
-                                                    <img src="{{ asset($item->image) }}"
-                                                         class="w-100 h-100 object-fit-cover news-image"
-                                                         alt="News">
-                                                @else
-                                                    <div class="w-100 h-100 bg-secondary d-flex align-items-center justify-content-center">
-                                                        <i class="bi bi-image text-white" style="font-size: 3rem; opacity: 0.3;"></i>
-                                                    </div>
-                                                @endif
-                                            </div>
-                                            
-                                            <!-- Контент -->
-                                            <div class="card-body p-3">
-                                                <small class="text-muted d-block mb-2">
-                                                    {{ \Carbon\Carbon::parse($item->publish_date ?? $item->created_at)->format('d.m.Y') }}
-                                                </small>
-                                                <h6 class="fw-bold text-dark mb-2" style="line-height: 1.4; min-height: 45px;">
-                                                    @if(session()->get('lang') == 'ru')
-                                                        {{ Str::limit($item->title_ru, 65) }}
-                                                    @elseif(session()->get('lang') == 'en')
-                                                        {{ Str::limit($item->title_en, 65) }}
-                                                    @else
-                                                        {{ Str::limit($item->title_tj, 65) }}
-                                                    @endif
-                                                </h6>
-                                                <p class="text-primary small mb-0">
-                                                    @if(session()->get('lang') == 'ru')
-                                                        Читать больше...
-                                                    @elseif(session()->get('lang') == 'en')
-                                                        Read more...
-                                                    @else
-                                                        Бештар хондан...
-                                                    @endif
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </a>
-                                </div>
+                    @if($news->images->count() > 1)
+                        <div class="gallery-thumbs">
+                            @foreach($news->images as $index => $image)
+                                <img src="{{ asset($image->image) }}"
+                                    class="{{ $index === 0 ? 'active' : '' }}"
+                                    onclick="goToSlide({{ $index }})" alt="Thumbnail">
                             @endforeach
                         </div>
-                    </div>
+                    @endif
+                </div>
+            @endif
+        </div>
+    </section>
 
-                    <!-- Точки пагинации -->
-                    <div class="d-flex justify-content-center gap-2 mt-4" id="pagination">
-                        <!-- Генерируются автоматически через JS -->
-                    </div>
+    {{-- Похожие новости --}}
+    @if(isset($related_news) && $related_news->count() > 0)
+        <section class="py-16 px-6" style="background: var(--dark-surface); border-top: 1px solid var(--dark-border);">
+            <div class="max-w-7xl mx-auto">
+                <div class="text-center mb-12">
+                    <p class="text-sm uppercase tracking-widest mb-3" style="color: var(--gold);">
+                        @if(session()->get('lang') == 'ru') Читайте также
+                        @elseif(session()->get('lang') == 'en') Also read
+                        @else Инчунин хонед @endif
+                    </p>
+                    <h2 class="section-title">
+                        @if(session()->get('lang') == 'ru') Другие новости
+                        @elseif(session()->get('lang') == 'en') Other News
+                        @else Дигар хабарҳо @endif
+                    </h2>
+                    <div class="gold-divider"></div>
+                </div>
 
+                <div class="grid md:grid-cols-3 gap-8">
+                    @foreach($related_news->take(3) as $item)
+                        <a href="{{ url('news/details/'.$item->id) }}" class="related-card block">
+                            <div class="h-48 overflow-hidden">
+                                @if(!empty($item->image) && $item->image !== 'no-image.jpg')
+                                    <img src="{{ asset($item->image) }}" class="w-full h-full object-cover" alt="News">
+                                @else
+                                    <div class="w-full h-full flex items-center justify-center" style="background: var(--dark-surface);">
+                                        <svg class="w-12 h-12 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" />
+                                        </svg>
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="p-5">
+                                <p class="text-xs mb-2" style="color: var(--text-muted);">
+                                    {{ \Carbon\Carbon::parse($item->publish_date ?? $item->created_at)->format('d.m.Y') }}
+                                </p>
+                                <h4 class="display-font text-lg font-bold text-white mb-2">
+                                    @if(session()->get('lang') == 'ru') {{ Str::limit($item->title_ru, 65) }}
+                                    @elseif(session()->get('lang') == 'en') {{ Str::limit($item->title_en, 65) }}
+                                    @else {{ Str::limit($item->title_tj, 65) }} @endif
+                                </h4>
+                                <span class="text-sm" style="color: var(--gold);">
+                                    @if(session()->get('lang') == 'ru') Читать далее
+                                    @elseif(session()->get('lang') == 'en') Read more
+                                    @else Бештар хондан @endif →
+                                </span>
+                            </div>
+                        </a>
+                    @endforeach
                 </div>
             </div>
-        @endif
+        </section>
+    @endif
+
+    {{-- Лайтбокс --}}
+    <div class="news-lightbox" id="newsLightbox" onclick="closeNewsLightbox()">
+        <button class="absolute top-6 right-6 text-white text-4xl hover:scale-110 transition-transform">&times;</button>
+        <img id="newsLightboxImg" src="" alt="Фото">
     </div>
-</section>
-
-<style>
-    /* Контент новости */
-    .news-content p {
-        margin-bottom: 1.2rem;
-        text-align: justify;
-    }
-
-    .news-content img {
-        max-width: 100%;
-        height: auto;
-        border-radius: 8px;
-        margin: 1.5rem 0;
-    }
-
-    .news-content h2, 
-    .news-content h3 {
-        margin-top: 2rem;
-        margin-bottom: 1rem;
-        font-weight: bold;
-    }
-
-    /* Карусель */
-    .news-carousel {
-        scroll-behavior: smooth;
-        transition: transform 0.4s ease;
-    }
-
-    .news-item {
-        transition: opacity 0.3s ease;
-    }
-
-    /* Hover эффект для карточек */
-    .hover-card {
-        transition: all 0.3s ease;
-    }
-
-    .hover-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 20px rgba(0,0,0,0.15) !important;
-    }
-
-    .news-image {
-        transition: transform 0.4s ease;
-    }
-
-    .hover-card:hover .news-image {
-        transform: scale(1.1);
-    }
-
-    .object-fit-cover {
-        object-fit: cover;
-    }
-
-    /* Точки пагинации */
-    .pagination-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background-color: #dee2e6;
-        cursor: pointer;
-        transition: all 0.3s ease;
-    }
-
-    .pagination-dot.active {
-        background-color: #0d6efd;
-        width: 24px;
-        border-radius: 4px;
-    }
-
-    /* Кнопки навигации */
-    .btn-outline-secondary:hover {
-        background-color: #6c757d;
-        color: white;
-    }
-
-    /* Адаптивность */
-    @media (max-width: 768px) {
-        .news-item {
-            width: 240px !important;
-        }
-        
-        h1 {
-            font-size: 1.5rem !important;
-        }
-    }
-</style>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // === БЛОК 1: ОБРАБОТКА КАРУСЕЛИ НОВОСТЕЙ ===
-    const carousel = document.getElementById('newsCarousel');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-    const pagination = document.getElementById('pagination');
-    
-    if (carousel && prevBtn && nextBtn && pagination) {
-        const items = carousel.querySelectorAll('.news-item');
-        const itemWidth = 280 + 12; // ширина + gap
-        const visibleItems = Math.floor(carousel.parentElement.offsetWidth / itemWidth);
-        const totalPages = Math.ceil(items.length / visibleItems);
-        let currentPage = 0;
-
-        // Создаем точки пагинации
-        for (let i = 0; i < totalPages; i++) {
-            const dot = document.createElement('div');
-            dot.className = 'pagination-dot' + (i === 0 ? ' active' : '');
-            dot.addEventListener('click', () => goToPage(i));
-            pagination.appendChild(dot);
-        }
-
-        function updatePagination() {
-            const dots = pagination.querySelectorAll('.pagination-dot');
-            dots.forEach((dot, index) => {
-                dot.classList.toggle('active', index === currentPage);
-            });
-        }
-
-        function goToPage(page) {
-            currentPage = Math.max(0, Math.min(page, totalPages - 1));
-            const scrollAmount = currentPage * itemWidth * visibleItems;
-            carousel.style.transform = `translateX(-${scrollAmount}px)`;
-            updatePagination();
-        }
-
-        prevBtn.addEventListener('click', () => {
-            goToPage(currentPage - 1);
-        });
-
-        nextBtn.addEventListener('click', () => {
-            goToPage(currentPage + 1);
-        });
-
-        // Адаптивность при изменении размера окна
-        window.addEventListener('resize', () => {
-            goToPage(0);
-        });
-    }
-    
-    // === БЛОК 2: ОБРАБОТКА МОДАЛЬНОГО ОКНА ===
-    const imageModal = document.getElementById('imageModal');
-    const modalImage = document.getElementById('modalImage');
-    let modalInstance = null;
-    
-    if (imageModal && modalImage) {
-        // Создаем экземпляр модального окна Bootstrap
-        modalInstance = new bootstrap.Modal(imageModal, {
-            backdrop: true,  // Включаем backdrop
-            keyboard: true   // Закрытие по ESC
-        });
-        
-        // Обработчик события открытия модального окна
-        imageModal.addEventListener('show.bs.modal', function (event) {
-            const trigger = event.relatedTarget;
-            if (trigger) {
-                const imageUrl = trigger.getAttribute('data-image');
-                if (imageUrl) {
-                    modalImage.src = imageUrl;
-                }
-            }
-        });
-        
-        // Функция для безопасного закрытия модального окна
-        function closeModal() {
-            if (modalInstance) {
-                modalInstance.hide();
-            }
-            // Дополнительная очистка на случай если что-то пойдет не так
-            setTimeout(() => {
-                const backdrops = document.querySelectorAll('.modal-backdrop');
-                backdrops.forEach(backdrop => backdrop.remove());
-                document.body.classList.remove('modal-open');
-                document.body.style.overflow = '';
-                document.body.style.paddingRight = '';
-            }, 100);
-        }
-        
-        // Обработчик для кнопки закрытия
-        const closeButton = imageModal.querySelector('.btn-close');
-        if (closeButton) {
-            closeButton.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                closeModal();
-            });
-        }
-        
-        // Закрытие по клику на backdrop (затемненный фон)
-        imageModal.addEventListener('click', function(e) {
-            // Закрываем только если клик был по самому модальному окну (backdrop), а не по содержимому
-            if (e.target === imageModal) {
-                closeModal();
-            }
-        });
-        
-        // Закрытие по клику на modal-dialog (область вне изображения)
-        const modalDialog = imageModal.querySelector('.modal-dialog');
-        if (modalDialog) {
-            modalDialog.addEventListener('click', function(e) {
-                // Закрываем если клик был по modal-dialog, но не по его содержимому
-                if (e.target === modalDialog || e.target.classList.contains('modal-content') || e.target.classList.contains('modal-body')) {
-                    closeModal();
-                }
-            });
-        }
-        
-        // Предотвращаем закрытие при клике на само изображение
-        if (modalImage) {
-            modalImage.addEventListener('click', function(e) {
-                e.stopPropagation();
-            });
-        }
-        
-        // Очистка после закрытия модального окна
-        imageModal.addEventListener('hidden.bs.modal', function () {
-            // Убеждаемся что backdrop удален
-            const backdrops = document.querySelectorAll('.modal-backdrop');
-            backdrops.forEach(backdrop => backdrop.remove());
-            document.body.classList.remove('modal-open');
-            document.body.style.overflow = '';
-            document.body.style.paddingRight = '';
-        });
-    }
-    
-    // === БЛОК 3: АЛЬТЕРНАТИВНЫЙ МЕТОД - ПРЯМОЙ КЛИК НА ИЗОБРАЖЕНИЯ ===
-    const galleryImages = document.querySelectorAll('.gallery-image');
-    galleryImages.forEach(function(img) {
-        img.addEventListener('click', function(e) {
-            e.preventDefault();
-            const imageUrl = this.getAttribute('data-image');
-            if (modalImage && imageUrl && modalInstance) {
-                modalImage.src = imageUrl;
-                modalInstance.show();
-            }
-        });
-    });
-});
-
-
-</script>
-
 @endsection
+
+@push('scripts')
+    <script>
+        // Галерея
+        const galleryImages = @json($news->images ? $news->images->pluck('image')->map(fn($img) => asset($img)) : []);
+        let currentSlide = 0;
+
+        function goToSlide(index) {
+            currentSlide = index;
+            const mainImg = document.getElementById('mainGalleryImg');
+            if (mainImg && galleryImages[index]) {
+                mainImg.src = galleryImages[index];
+            }
+            document.querySelectorAll('.gallery-thumbs img').forEach((thumb, i) => {
+                thumb.classList.toggle('active', i === index);
+            });
+        }
+
+        function nextSlide() {
+            goToSlide((currentSlide + 1) % galleryImages.length);
+        }
+
+        function prevSlide() {
+            goToSlide((currentSlide - 1 + galleryImages.length) % galleryImages.length);
+        }
+
+        // Лайтбокс
+        function openNewsLightbox(src) {
+            document.getElementById('newsLightboxImg').src = src;
+            document.getElementById('newsLightbox').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeNewsLightbox() {
+            document.getElementById('newsLightbox').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeNewsLightbox();
+        });
+    </script>
+@endpush

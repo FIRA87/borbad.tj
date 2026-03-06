@@ -129,9 +129,15 @@ public function update(DocumentRequest $request, Document $document)
 
     public function download(Document $document)
     {
-        if (!$document->file_path || !File::exists(public_path($document->file_path))) {
+        $filePath = $document->file_path;
+        if (empty($filePath) || str_contains($filePath, '..')) {
             abort(404);
         }
-        return response()->download(public_path($document->file_path));
+        $absolutePath = public_path($filePath);
+        $realPath = realpath($absolutePath);
+        if ($realPath === false || !str_starts_with($realPath, realpath(public_path()))) {
+            abort(404);
+        }
+        return response()->download($realPath);
     }
 }

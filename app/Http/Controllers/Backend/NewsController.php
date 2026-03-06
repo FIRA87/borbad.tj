@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Category;
 use App\Models\News;
 use App\Models\NewsImage;
-use App\Models\Task;
 use App\Models\User;
 use Illuminate\Support\Str;
 use Intervention\Image\Facades\Image;
@@ -25,13 +24,12 @@ class NewsController extends Controller
     public function addNews()
     {
         $categories = Category::all();
-        $tasks = Task::where('status', 1)->orderBy('sort', 'asc')->get();
         $adminUser = User::where('role', 'admin')->latest()->get();
-        return view('backend.news.create', compact('categories', 'tasks', 'adminUser'));
+        return view('backend.news.create', compact('categories', 'adminUser'));
     }
 
     public function storeNews(NewsRequest $request)
-    {        
+    {
         $data = $request->validated();
         $imagePath = $this->handleImageUpload($request);
 
@@ -53,11 +51,6 @@ class NewsController extends Controller
             'status' => $data['status'] ?? 1,
             'created_at' => now(),
         ]);
-
-        // Привязка задач (если выбраны)
-        if ($request->has('tasks') && is_array($request->tasks)) {
-            $news->tasks()->attach($request->tasks);
-        }
 
         // Загрузка дополнительных изображений (если есть)
         if ($request->hasFile('gallery')) {
@@ -88,10 +81,9 @@ class NewsController extends Controller
     public function editNews($id)
     {
         $categories = Category::latest()->get();
-        $tasks = Task::where('status', 1)->orderBy('sort', 'asc')->get();
         $adminUser = User::where('role', 'admin')->latest()->get();
-        $news = News::with(['tasks', 'images'])->findOrFail($id);
-        return view('backend.news.edit', compact('categories', 'tasks', 'adminUser', 'news'));
+        $news = News::with('images')->findOrFail($id);
+        return view('backend.news.edit', compact('categories', 'adminUser', 'news'));
     }
 
     public function updateNews(NewsRequest $request, $id)
@@ -124,13 +116,6 @@ class NewsController extends Controller
         }
 
         $news->update($updateData);
-
-        // Обновление задач
-        if ($request->has('tasks') && is_array($request->tasks)) {
-            $news->tasks()->sync($request->tasks);
-        } else {
-            $news->tasks()->detach();
-        }
 
         // Загрузка новых изображений галереи
         if ($request->hasFile('gallery')) {
@@ -196,7 +181,7 @@ class NewsController extends Controller
             }
         }
 
-        // Удаление записи из БД (каскадное удаление удалит связи с tasks и images)
+        // Удаление записи из БД (каскадное удаление удалит связанные images)
         $news->delete();
 
         return back()->with([

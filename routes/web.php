@@ -1,58 +1,58 @@
 <?php
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use App\Http\Middleware\RedirectIfAuthenticated;
-use App\Http\Controllers\UserController;
-use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Backend\JobController;
 use App\Http\Controllers\Backend\LinkController;
 use App\Http\Controllers\Backend\NewsController;
 use App\Http\Controllers\Backend\PageController;
 use App\Http\Controllers\Backend\RoleController;
-use App\Http\Controllers\Backend\TaskController;
 use App\Http\Controllers\Backend\AdminController;
+use App\Http\Controllers\Backend\AboutController;
 use App\Http\Controllers\Backend\MediaController;
 use App\Http\Controllers\Backend\VideoController;
 use App\Http\Controllers\Backend\LeaderController;
-use App\Http\Controllers\Backend\OptionController;
-use App\Http\Controllers\Backend\SurveyController;
 use App\Http\Controllers\Backend\ContactController;
 use App\Http\Controllers\Backend\GalleryController;
-use App\Http\Controllers\Backend\ProjectController;
 use App\Http\Controllers\Backend\ServiceController;
 use App\Http\Controllers\Backend\SettingController;
 use App\Http\Controllers\Backend\SubMenuController;
 use App\Http\Controllers\Backend\CategoryController;
 use App\Http\Controllers\Backend\DocumentController;
-use App\Http\Controllers\Backend\QuestionController;
 use App\Http\Controllers\Backend\PresidentController;
 use App\Http\Controllers\Backend\ServiceRequestAdminController;
 use App\Http\Controllers\Backend\JobApplicationBackendController;
 use App\Http\Controllers\Backend\StaticTranslationController;
 use App\Http\Controllers\Frontend\LanguageController;
-use App\Http\Controllers\Frontend\SurveyVoteController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Frontend\ServiceRequestController;
 use App\Http\Controllers\Frontend\MenuController;
 use App\Http\Controllers\Frontend\IndexController;
 use App\Http\Controllers\Frontend\JobApplicationController;
 
-Route::get('/page/4', function () { return redirect('/projects'); });
-Route::get('/page/5', function () { return redirect('/services'); });
-Route::get('/page/6', function () { return redirect('/frontend/jobs'); });
-Route::get('/page/8', function () { return redirect('/news'); });
+Route::get('/page/1', function () { return redirect('/about'); });
+Route::get('/page/11', function () { return redirect('/contact-us'); });
+Route::get('/page/12', function () { return redirect('/frontend/jobs'); });
 Route::get('/submenu/1', function () { return redirect('/leaders'); });
-Route::get('/page/7', function () { return redirect('/frontend/documents'); });
-
-
-
-
+Route::get('/page/10', function () { return redirect('/galleries'); });
 
 Route::get('/lang/en', [LanguageController::class, 'enLang'])->name('en.lang');
 Route::get('/lang/ru', [LanguageController::class, 'ruLang'])->name('ru.lang');
 Route::get('/lang/tj', [LanguageController::class, 'tjLang'])->name('tj.lang');
 
+
+Route::get('/page/9', function () { return redirect('/events'); });
 /// Access FOR ALL
 Route::get('/', [IndexController::class, 'index'])->name('index');
+Route::get('/about', [IndexController::class, 'aboutPage'])->name('frontend.about');
+Route::get('/afisha', [IndexController::class, 'afishaPage'])->name('frontend.afisha');
+Route::get('/afisha/{id}', [IndexController::class, 'afishaDetail'])->name('frontend.afisha.detail');
+Route::get('/events', [IndexController::class, 'eventsPage'])->name('frontend.events');
+Route::get('/events/{id}', [IndexController::class, 'eventsDetail'])->name('frontend.events.detail');
+Route::get('/gallery-page', [IndexController::class, 'galleryPage'])->name('frontend.gallery.page');
+Route::get('/contact-us', [IndexController::class, 'contactsPage'])->name('frontend.contacts.page');
 Route::get('/news', [IndexController::class, 'filterNews'])->name('frontend.news');
 Route::get('/news/details/{id}', [IndexController::class, 'newsDetails'])->name('news_details');
 
@@ -61,8 +61,6 @@ Route::post('/news/search', [IndexController::class, 'newsSearch'])->name('news.
 Route::get('/gallery/details/{id}', [IndexController::class, 'galleryDetails'])->name('frontend.gallery.detail');
 Route::get('/services', [ServiceRequestController::class, 'index'])->name('frontend.services');
 Route::post('/service-request', [ServiceRequestController::class, 'store'])->name('frontend.service.request');
-Route::get('/projects', [IndexController::class, 'allProjects'])->name('frontend.projects');
-Route::get('/projects/{id}', [IndexController::class, 'projectDetail'])->name('frontend.project.detail');
 Route::get('/galleries', [IndexController::class, 'allGalleries'])->name('frontend.galleries');
 Route::get('/videos', [IndexController::class, 'allVideos'])->name('frontend.videos');
 Route::get('/reporter/{id}', [IndexController::class, 'reporterAllNews'])->name('reporter.all.news');
@@ -86,14 +84,6 @@ Route::post('frontend/jobs/submit', [JobApplicationController::class, 'submitApp
 Route::get('frontend/jobs/{job}/download/{index}', [JobController::class, 'downloadAttachment'])->name('frontend.jobs.download');
 
 
-
-// Frontend show & voting
-Route::get('survey/{survey}', function(\App\Models\Survey $survey){
-    $survey->load('questions.options');
-    return view('frontend.survey.show', compact('survey'));
-})->name('survey.show');
-
-Route::post('survey/{surveyId}/vote', [SurveyVoteController::class,'vote'])->name('survey.vote');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
@@ -133,15 +123,8 @@ Route::middleware(['auth', 'roles:admin'])->group(function () {
         Route::post('/update/category', 'updateCategory')->name('update.category');
         Route::get('/delete/category/{id}', 'deleteCategory')->name('delete.category');
     });
-    // Surveys Routes
-    Route::prefix('admin')->group(function () {
-        Route::resource('surveys', SurveyController::class);
-        //Route::resource('questions', QuestionController::class)->except(['show']);
-        //Route::resource('options', OptionController::class)->except(['show']);
-    });
 
-
-     // Маршруты для статических переводов
+    // Маршруты для статических переводов
     Route::resource('static-translations', StaticTranslationController::class);
 
 
@@ -247,6 +230,11 @@ Route::middleware(['auth', 'roles:admin'])->group(function () {
         Route::post('/admin/pages/delete-image', 'deleteImage')->name('pages.delete.image');
     });
 
+    // Страница «О нас» — один контент-блок, редактирование в админке
+    Route::get('/admin/about', [AboutController::class, 'index'])->name('admin.about.index');
+    Route::get('/admin/about/{about}/edit', [AboutController::class, 'edit'])->name('admin.about.edit');
+    Route::put('/admin/about/{about}', [AboutController::class, 'update'])->name('admin.about.update');
+
     // SubMenu routes
     Route::controller(SubMenuController::class)->group(function () {
         Route::get('/all/sub_menu', 'index')->name('all.submenu');
@@ -257,7 +245,7 @@ Route::middleware(['auth', 'roles:admin'])->group(function () {
         Route::get('/delete/submenu/{id}', 'delete')->name('delete.submenu');
         Route::post('/admin/submenu/update-status', 'updateStatus');
         Route::post('/admin/submenu/delete-image', 'deleteImage')->name('submenu.delete.image');
-     
+
     });
 
     // Site Settings
@@ -274,27 +262,6 @@ Route::middleware(['auth', 'roles:admin'])->group(function () {
         Route::get('/edit/presidents/{id}', 'edit')->name('edit.presidents');
         Route::post('/update/presidents', 'update')->name('update.presidents');
         Route::get('/delete/presidents/{id}', 'delete')->name('delete.presidents');
-    });
-
-    // PROJECTS ROUTES
-    Route::controller(ProjectController::class)->group(function () {
-        Route::get('/all/projects', 'index')->name('all.projects');
-        Route::get('/add/projects', 'create')->name('add.projects');
-        Route::post('/store/projects', 'store')->name('store.projects');
-        Route::get('/edit/projects/{id}', 'edit')->name('edit.projects');
-        Route::post('/update/projects', 'update')->name('update.projects');
-        Route::get('/delete/projects/{id}', 'delete')->name('delete.projects');
-        Route::post('/delete/projects/gallery/image', 'deleteGalleryImage')->name('delete.projects.gallery.image');
-    });
-
-    // TASKS ROUTES
-    Route::controller(TaskController::class)->group(function () {
-        Route::get('/all/tasks', 'index')->name('all.tasks');
-        Route::get('/add/tasks', 'create')->name('add.tasks');
-        Route::post('/store/tasks', 'store')->name('store.tasks');
-        Route::get('/edit/tasks/{id}', 'edit')->name('edit.tasks');
-        Route::post('/update/tasks', 'update')->name('update.tasks');
-        Route::get('/delete/tasks/{id}', 'delete')->name('delete.tasks');
     });
 
     Route::prefix('documents')->name('documents.')->controller(DocumentController::class)->group(function () {
@@ -352,7 +319,7 @@ Route::middleware(['auth', 'roles:admin'])->group(function () {
 
     Route::post('/jobs/{job}/delete-attachment', [JobController::class, 'deleteAttachment'])->name('jobs.delete.attachment');
 
-    // Управление заявками на вакансии  
+    // Управление заявками на вакансии
     Route::get('/admin/applications', [JobApplicationBackendController::class, 'index'])->name('backend.applications.index');
     Route::get('/admin/applications/{application}', [JobApplicationBackendController::class, 'show'])->name('backend.applications.show');
     Route::patch('/admin/applications/{application}/status', [JobApplicationBackendController::class, 'updateStatus'])->name('backend.applications.status');
@@ -370,14 +337,14 @@ Route::middleware(['auth', 'roles:admin'])->group(function () {
 });
 
 /**
- * Route for clearing cache when uploading to Production Server
+ * Route for clearing cache when uploading to Production Server.
+ * Доступ только для администратора (защита от несанкционированного сброса кеша).
  */
 Route::get('/clear-configuration', function () {
     Artisan::call('cache:clear');
     Artisan::call('config:cache');
     Artisan::call('view:clear');
     Artisan::call('route:clear');
-    Artisan::call('route:clear');
 
     return "Everything is clear and system is ready to work.";
-});
+})->middleware(['auth', 'roles:admin']);

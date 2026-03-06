@@ -38,6 +38,9 @@ class SettingController extends Controller
                 'contact_title' => '',
                 'contact_detail' => '',
                 'contact_map' => '',
+                'working_hours_weekdays' => '',
+                'working_hours_weekend' => '',
+                'working_hours_box' => '',
                 'logo' => '',
             ]);
         }
@@ -65,6 +68,9 @@ class SettingController extends Controller
             'contact_title' => 'nullable|string|max:255',
             'contact_detail' => 'nullable|string|max:255',
             'contact_map' => 'nullable|string',
+            'working_hours_weekdays' => 'nullable|string|max:100',
+            'working_hours_weekend' => 'nullable|string|max:100',
+            'working_hours_box' => 'nullable|string|max:255',
             'logo' => 'nullable|image|mimes:jpeg,png,jpg,svg|max:5120',
         ]);
 
@@ -131,6 +137,7 @@ class SettingController extends Controller
             'name'    => 'required|string|max:255',
             'phone'   => 'required|string|max:50',
             'email'   => 'required|email',
+            'subject' => 'nullable|string|max:50',
             'message' => 'required|string',
         ], [
             'name.required'    => 'Укажите Ф.И.О.',
@@ -156,6 +163,7 @@ class SettingController extends Controller
             'name'          => $request->name,
             'email'         => $request->email,
             'phone'         => $request->phone,
+            'subject'       => $request->subject,
             'message_ru'    => $locale == 'ru' ? $request->message : null,
             'message_tj'    => $locale == 'tj' ? $request->message : null,
             'message_en'    => $locale == 'en' ? $request->message : null,
@@ -168,11 +176,14 @@ class SettingController extends Controller
         // Отправка письма админу (оставляем как есть)
         $admin = Setting::first();
         $subject = 'Новое обращение с сайта';
+        $labels = Contact::subjectLabels();
+        $subjectLabel = $request->subject ? ($labels[$request->subject] ?? $request->subject) : '—';
         $mailMessage = '<p>Новое обращение:</p>
             <table border="1" cellpadding="10" style="border-collapse: collapse;">
                 <tr><th>Имя</th><td>'.$request->name.'</td></tr>
                 <tr><th>Телефон</th><td>'.$request->phone.'</td></tr>
                 <tr><th>Email</th><td>'.$request->email.'</td></tr>
+                <tr><th>Тема обращения</th><td>'.e($subjectLabel).'</td></tr>
                 <tr><th>Сообщение</th><td>'.nl2br(e($request->message)).'</td></tr>
                 <tr><th>Дата</th><td>'.now()->format('d.m.Y H:i').'</td></tr>
             </table>';
@@ -198,7 +209,6 @@ class SettingController extends Controller
         //     ->with('message', 'Ваше сообщение успешно отправлено! Спасибо за обращение.')
         //     ->with('alert-type', 'success');
     }
+
 //==================END FRONT CONTROLLER======================//
-
-
 }

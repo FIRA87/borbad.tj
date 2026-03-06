@@ -13,6 +13,7 @@
                 <th>Имя</th>
                 <th>Email</th>
                 <th>Телефон</th>
+                <th>Тема обращения</th>
                 <th>Дата</th>
                 <th>Действия</th>
             </tr>
@@ -24,6 +25,7 @@
                     <td>{{ $c->title_ru }}</td>
                     <td>{{ $c->email }}</td>
                     <td>{{ $c->phone }}</td>
+                    <td>{{ $c->subject_label }}</td>
                     <td>{{ $c->created_at->format('d.m.Y H:i') }}</td>
                     <td>
                         @if(Auth::user()->can('contacts.add'))

@@ -100,12 +100,11 @@
 
 
                                   <div class="form-group mb-3">
-                                        <!-- Поле для выбора даты -->
                                       <div class="form-group mb-3">
-                                        <label for="publish_date" class="form-label">Дата публикации</label>
-                                        <input type="date"  id="publish_date" class="form-control" name="publish_date" value="{{ old('publish_date', $news->publish_date) }}">
-                                    </div>
-
+                                        <label for="publish_date" class="form-label">Дата и время публикации</label>
+                                        <input type="datetime-local" id="publish_date" class="form-control" name="publish_date"
+                                            value="{{ old('publish_date', \Carbon\Carbon::parse($news->publish_date)->format('Y-m-d\TH:i')) }}">
+                                      </div>
                                   </div>
 
                                     <div class="form-group col-md-4">
@@ -126,21 +125,6 @@
                                     <div class="form-check mb-2 form-check-primary">
                                         <input class="form-check-input" type="checkbox" name="home_page" value="1" id="home_page_check" {{ old('home_page', $news->home_page) == 1 ? 'checked' : '' }}>
                                         <label class="form-check-label" for="home_page_check">На главной</label>
-                                    </div>
-                                </div>
-
-                                <!-- Задачи -->
-                                <div class="col-md-12 mt-3">
-                                    <div class="form-group mb-3">
-                                        <label class="form-label">Задачи (необязательно)</label>
-                                        <select class="form-select" name="tasks[]" multiple size="5">
-                                            @foreach ($tasks as $task)
-                                                <option value="{{ $task->id }}" {{ (collect(old('tasks', $news->tasks->pluck('id')->toArray()))->contains($task->id)) ? 'selected' : '' }}>
-                                                    {{ $task->title_ru }}
-                                                </option>
-                                            @endforeach
-                                        </select>
-                                        <small class="text-muted">Удерживайте Ctrl для выбора нескольких задач</small>
                                     </div>
                                 </div>
 

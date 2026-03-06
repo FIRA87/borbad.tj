@@ -1,242 +1,293 @@
 @extends('frontend.master')
 
-
 @section('title')
-    @if(session()->get('lang') == 'ru')
+    @if (session()->get('lang') == 'ru')
         {{ $job->title_ru }}
     @elseif(session()->get('lang') == 'en')
         {{ $job->title_en }}
     @else
-         {{ $job->title_tj }}
+        {{ $job->title_tj }}
     @endif
 @endsection
 
-
 @section('content')
-<div class="container py-5">
-    <div class="row">
-        <div class="col-lg-12">
-            <nav aria-label="breadcrumb">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item">
-                        <a href="{{ route('frontend.jobs.index') }}">@trans('vacancies')
-                        </a>
-                    </li>
-                    <li class="breadcrumb-item active">{{ $job->{'title_'.app()->getLocale()} }}</li>
-                </ol>
-            </nav>
+    {{-- Заголовок --}}
+    <section class="pt-16 pb-12 px-6" style="background: var(--dark-surface); border-bottom: 1px solid var(--dark-border);">
+        <div class="max-w-4xl mx-auto">
+            {{-- Хлебные крошки --}}
+            <div class="flex items-center gap-2 text-sm mb-6">
+                <a href="{{ route('frontend.jobs.index') }}" class="text-gray-500 hover:text-white transition">
+                    @if (session()->get('lang') == 'ru')
+                        Вакансии
+                    @elseif(session()->get('lang') == 'en')
+                        Vacancies
+                    @else
+                        Вакансияҳо
+                    @endif
+                </a>
+                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+                <span class="text-gray-400 truncate">
+                    @if (session()->get('lang') == 'ru')
+                        {{ $job->title_ru }}
+                    @elseif(session()->get('lang') == 'en')
+                        {{ $job->title_en }}
+                    @else
+                        {{ $job->title_tj }}
+                    @endif
+                </span>
+            </div>
 
-            <div class="card shadow-sm">
-                @if($job->image)
-                    <img src="{{ asset($job->image) }}" 
-                         class="card-img-top" 
-                         alt="{{ $job->{'title_'.app()->getLocale()} }}"
-                         style="max-height: 400px; object-fit: cover;">
+            <h1 class="display-font text-4xl md:text-5xl font-bold text-white mb-4">
+                @if (session()->get('lang') == 'ru')
+                    {{ $job->title_ru }}
+                @elseif(session()->get('lang') == 'en')
+                    {{ $job->title_en }}
+                @else
+                    {{ $job->title_tj }}
                 @endif
+            </h1>
 
-                <div class="card-body">
-                    <h1 class="card-title mb-4">{{ $job->{'title_'.app()->getLocale()} }}</h1>
-
-                    <div class="row mb-4">
-                        @if($job->location)
-                            <div class="col-md-6 mb-2">
-                                <strong><i class="fas fa-map-marker-alt"></i> 
-                                    @if(session()->get('lang') == 'ru')
-                                        Местоположение
-                                    @elseif(session()->get('lang') == 'en')
-                                        Location
-                                    @else
-                                        Ҷойгиршавӣ
-                                    @endif:</strong> {{ $job->location }}
-                            </div>
-                        @endif
-
-                        @if($job->salary)
-                            <div class="col-md-6 mb-2">
-                                <strong><i class="fas fa-money-bill-wave"></i> 
-                                    @if(session()->get('lang') == 'ru')
-                                        Зарплата
-                                    @elseif(session()->get('lang') == 'en')
-                                        Salary
-                                    @else
-                                        Музди меҳнат
-                                    @endif:</strong> {{ $job->salary }}
-                            </div>
-                        @endif
-
-                        @if($job->start_date)
-                            <div class="col-md-6 mb-2">
-                                <strong><i class="fas fa-calendar-alt"></i> 
-                                    @if(session()->get('lang') == 'ru')
-                                        Дата начала
-                                    @elseif(session()->get('lang') == 'en')
-                                        Start Date
-                                    @else
-                                        Санаи оғоз
-                                    @endif:</strong> {{ $job->start_date->format('d.m.Y') }}
-                            </div>
-                        @endif
-
-                        @if($job->end_date)
-                            <div class="col-md-6 mb-2">
-                                <strong><i class="fas fa-calendar-times"></i> 
-                                    @if(session()->get('lang') == 'ru')
-                                        Дата окончания
-                                    @elseif(session()->get('lang') == 'en')
-                                        End Date
-                                    @else
-                                        Санаи хотима
-                                    @endif:</strong> {{ $job->end_date->format('d.m.Y') }}
-                            </div>
+            {{-- Метаданные --}}
+            <div class="flex flex-wrap items-center gap-4 mt-6">
+                @if ($job->location)
+                    <div class="flex items-center gap-2 text-sm text-gray-400">
+                        <svg class="w-4 h-4" style="color: var(--gold);" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        {{ $job->location }}
+                    </div>
+                @endif
+                @if ($job->salary)
+                    <div class="flex items-center gap-2 text-sm" style="color: var(--gold);">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        {{ $job->salary }}
+                    </div>
+                @endif
+                @if ($job->start_date)
+                    <div class="flex items-center gap-2 text-sm text-gray-400">
+                        <svg class="w-4 h-4" style="color: var(--gold);" fill="none" stroke="currentColor"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                        {{ $job->start_date->format('d.m.Y') }}
+                        @if ($job->end_date)
+                            — {{ $job->end_date->format('d.m.Y') }}
                         @endif
                     </div>
+                @endif
+            </div>
+        </div>
+    </section>
 
-                    @if($job->{'description_'.app()->getLocale()})
-                        <div class="mb-4">
-                            <h4>
-                                @if(session()->get('lang') == 'ru')
+    {{-- Контент --}}
+    <section class="py-16 px-6 section-dark">
+        <div class="max-w-4xl mx-auto">
+            <div class="grid lg:grid-cols-3 gap-10">
+                {{-- Основной контент --}}
+                <div class="lg:col-span-2 space-y-10">
+                    @if ($job->image)
+                        <div class="rounded-2xl overflow-hidden border" style="border-color: var(--dark-border);">
+                            <img src="{{ asset($job->image) }}" alt="{{ $job->{'title_' . app()->getLocale()} }}"
+                                class="w-full h-auto max-h-96 object-cover">
+                        </div>
+                    @endif
+
+                    @if ($job->{'description_' . app()->getLocale()})
+                        <div>
+                            <h2 class="display-font text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                                <div class="w-1 h-6 rounded-full" style="background: var(--gold);"></div>
+                                @if (session()->get('lang') == 'ru')
                                     Описание
                                 @elseif(session()->get('lang') == 'en')
                                     Description
                                 @else
                                     Тавсиф
                                 @endif
-                            </h4>
-                            <div class="text-justify">{!! nl2br(e($job->{'description_'.app()->getLocale()})) !!}</div>
+                            </h2>
+                            <div class="text-gray-300 leading-relaxed prose-dark">
+                                @if (session()->get('lang') == 'ru')
+                                    {{ $job->description_ru }}
+                                @elseif(session()->get('lang') == 'en')
+                                    {{ $job->description_en }}
+                                @else
+                                    {{ $job->description_tj }}
+                                @endif
+
+                            </div>
                         </div>
                     @endif
 
-                    @if($job->{'requirements_'.app()->getLocale()})
-                        <div class="mb-4">
-                            <h4>
-                                @if(session()->get('lang') == 'ru')
+                    @if ($job->{'requirements_' . app()->getLocale()})
+                        <div>
+                            <h2 class="display-font text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                                <div class="w-1 h-6 rounded-full" style="background: var(--gold);"></div>
+                                @if (session()->get('lang') == 'ru')
                                     Требования
                                 @elseif(session()->get('lang') == 'en')
                                     Requirements
                                 @else
                                     Талабот
                                 @endif
-                            </h4>
-                            <div class="text-justify">{!! nl2br(e($job->{'requirements_'.app()->getLocale()})) !!}</div>
+                            </h2>
+                            <div class="text-gray-300 leading-relaxed">
+
+                                @if (session()->get('lang') == 'ru')
+                                    {{ $job->requirements_ru }}
+                                @elseif(session()->get('lang') == 'en')
+                                    {{ $job->requirements_en }}
+                                @else
+                                    {{ $job->requirements_tj }}
+                                @endif
+
+                            </div>
                         </div>
                     @endif
 
-                    @if($job->attachments && count($job->attachments) > 0)
-                        <div class="mb-4">
-                            <h4>
-                                @if(session()->get('lang') == 'ru')
+                    @if ($job->attachments && count($job->attachments) > 0)
+                        <div>
+                            <h2 class="display-font text-2xl font-bold text-white mb-4 flex items-center gap-3">
+                                <div class="w-1 h-6 rounded-full" style="background: var(--gold);"></div>
+                                @if (session()->get('lang') == 'ru')
                                     Документы
                                 @elseif(session()->get('lang') == 'en')
                                     Documents
                                 @else
                                     Ҳуҷҷатҳо
                                 @endif
-                            </h4>
-                            <ul class="list-unstyled">
-                                @foreach($job->attachments as $index => $file)
-                                    <li class="mb-2">
-                                        <a href="{{ route('frontend.jobs.download', ['job' => $job->id, 'index' => $index]) }}" 
-                                           class="btn btn-outline-primary btn-sm">
-                                            <i class="fas fa-download"></i> 
-                                            @if(session()->get('lang') == 'ru')
+                            </h2>
+                            <div class="space-y-2">
+                                @foreach ($job->attachments as $index => $file)
+                                    <a href="{{ route('frontend.jobs.download', ['job' => $job->id, 'index' => $index]) }}"
+                                        class="flex items-center gap-3 p-4 rounded-xl transition-all hover:-translate-y-1"
+                                        style="background: var(--dark-card); border: 1px solid var(--dark-border);">
+                                        <svg class="w-5 h-5 flex-shrink-0" style="color: var(--gold);" fill="none"
+                                            stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        <span class="text-gray-300 text-sm">
+                                            @if (session()->get('lang') == 'ru')
                                                 Скачать документ
                                             @elseif(session()->get('lang') == 'en')
                                                 Download document
                                             @else
                                                 Боргирии ҳуҷҷат
                                             @endif {{ $index + 1 }}
-                                        </a>
-                                    </li>
+                                        </span>
+                                    </a>
                                 @endforeach
-                            </ul>
+                            </div>
                         </div>
                     @endif
-
-                    <div class="text-center mt-4">
-                        <a href="{{ route('frontend.jobs.apply', $job->slug) }}" class="btn btn-success btn-lg" style="color: #ffffff !important;">
-                            <i class="fas fa-paper-plane"></i> 
-                            @if(session()->get('lang') == 'ru')
-                                Подать заявку
-                            @elseif(session()->get('lang') == 'en')
-                                Apply
-                            @else
-                                Аризадиҳӣ
-                            @endif
-                        </a>
-                        <a href="{{ route('frontend.jobs.index') }}" class="btn btn-outline-secondary btn-lg ms-2">
-                            <i class="fas fa-arrow-left"></i> 
-                            @if(session()->get('lang') == 'ru')
-                                Назад к вакансиям
-                            @elseif(session()->get('lang') == 'en')
-                                Back to Vacancies
-                            @else
-                                Бозгашт ба вакансияҳо
-                            @endif
-                        </a>
-                    </div>
                 </div>
-            </div>
 
-            <!-- Дополнительная информация -->
-            <div class="card mt-4 bg-light">
-                <div class="card-body">
-                    <h5 class="mb-3">
-                        <i class="fas fa-info-circle"></i> 
-                        @if(session()->get('lang') == 'ru')
-                            Дополнительная информация
+                {{-- Боковая панель --}}
+                <div class="space-y-6">
+                    {{-- Кнопка подачи заявки --}}
+                    <a href="{{ route('frontend.jobs.apply', $job->slug) }}"
+                        class="btn-primary w-full py-4 text-center text-lg font-semibold block">
+                        @if (session()->get('lang') == 'ru')
+                            Подать заявку
                         @elseif(session()->get('lang') == 'en')
-                            Additional Information
+                            Apply Now
                         @else
-                            Маълумоти иловагӣ
+                            Аризадиҳӣ
                         @endif
-                    </h5>
-                    <p class="mb-2">
-                        <strong>
-                            @if(session()->get('lang') == 'ru')
-                                Дата публикации
+                    </a>
+
+                    {{-- Инфо-карточка --}}
+                    <div class="p-6 rounded-2xl"
+                        style="background: var(--dark-card); border: 1px solid var(--dark-border);">
+                        <h3 class="text-sm font-semibold uppercase tracking-wider mb-4" style="color: var(--gold);">
+                            @if (session()->get('lang') == 'ru')
+                                Информация
                             @elseif(session()->get('lang') == 'en')
-                                Publication Date
+                                Info
                             @else
-                                Санаи нашр
-                            @endif:</strong> {{ $job->created_at->format('d.m.Y') }}
-                    </p>
-                    @if($job->end_date)
-                        <p class="mb-0">
-                            <strong>
-                                @if(session()->get('lang') == 'ru')
-                                    Прием заявок до
-                                @elseif(session()->get('lang') == 'en')
-                                    Applications accepted until
-                                @else
-                                    Қабули аризаҳо то
-                                @endif:</strong> {{ $job->end_date->format('d.m.Y') }}
-                        </p>
-                    @endif
+                                Маълумот
+                            @endif
+                        </h3>
+                        <div class="space-y-4">
+                            <div>
+                                <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                                    @if (session()->get('lang') == 'ru')
+                                        Дата публикации
+                                    @elseif(session()->get('lang') == 'en')
+                                        Published
+                                    @else
+                                        Санаи нашр
+                                    @endif
+                                </p>
+                                <p class="text-gray-300 text-sm">{{ $job->created_at->format('d.m.Y') }}</p>
+                            </div>
+                            @if ($job->end_date)
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                                        @if (session()->get('lang') == 'ru')
+                                            Приём заявок до
+                                        @elseif(session()->get('lang') == 'en')
+                                            Deadline
+                                        @else
+                                            Мӯҳлат
+                                        @endif
+                                    </p>
+                                    <p class="text-sm font-semibold" style="color: var(--gold);">
+                                        {{ $job->end_date->format('d.m.Y') }}</p>
+                                </div>
+                            @endif
+                            @if ($job->location)
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                                        @if (session()->get('lang') == 'ru')
+                                            Место
+                                        @elseif(session()->get('lang') == 'en')
+                                            Location
+                                        @else
+                                            Ҷой
+                                        @endif
+                                    </p>
+                                    <p class="text-gray-300 text-sm">{{ $job->location }}</p>
+                                </div>
+                            @endif
+                            @if ($job->salary)
+                                <div>
+                                    <p class="text-xs text-gray-500 uppercase tracking-wider mb-1">
+                                        @if (session()->get('lang') == 'ru')
+                                            Зарплата
+                                        @elseif(session()->get('lang') == 'en')
+                                            Salary
+                                        @else
+                                            Музд
+                                        @endif
+                                    </p>
+                                    <p class="text-sm font-semibold" style="color: var(--gold);">{{ $job->salary }}</p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+
+                    {{-- Назад --}}
+                    <a href="{{ route('frontend.jobs.index') }}" class="btn-outline w-full py-3 text-center text-sm block">
+                        @if (session()->get('lang') == 'ru')
+                            Все вакансии
+                        @elseif(session()->get('lang') == 'en')
+                            All Vacancies
+                        @else
+                            Ҳамаи вакансияҳо
+                        @endif
+                    </a>
                 </div>
             </div>
         </div>
-    </div>
-</div>
-
-<style>
-    .text-justify {
-        text-align: justify;
-    }
-    
-    .card {
-        border-radius: 10px;
-    }
-    
-    .card-img-top {
-        border-radius: 10px 10px 0 0;
-    }
-    
-    h4 {
-        color: #2c3e50;
-        font-weight: 600;
-        margin-bottom: 1rem;
-        padding-bottom: 0.5rem;
-        border-bottom: 2px solid #e9ecef;
-    }
-</style>
+    </section>
 @endsection

@@ -8,9 +8,14 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * Пропускаем создание, если таблица уже есть (например, создана вручную или старым деплоем).
      */
     public function up(): void
     {
+        if (Schema::hasTable('job_applications')) {
+            return;
+        }
+
         Schema::create('job_applications', function (Blueprint $table) {
             $table->id();
           

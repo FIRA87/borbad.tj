@@ -17,7 +17,7 @@ class ServiceRequestController extends Controller
     public function index()
     {
         $services = Service::where('status', 1)->orderBy('id', 'asc')->get();
-        return view('frontend.services', compact('services'));
+        return view('frontend.pages.services', compact('services'));
     }
 
     /**

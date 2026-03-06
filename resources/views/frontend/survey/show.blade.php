@@ -6,43 +6,40 @@
 <!-- Опросник -->
 <section class="survey-section">
     <div class="container">
-        <div class="survey-card">
-            <h2 class="survey-title">{{ $survey->title_ru }}</h2>
-            @if ($survey->description_ru)
-                <p class="survey-description">{{ $survey->description_ru }}</p>
-            @endif
+        <div class="survey-card">        
 
             @foreach ($survey->questions as $question)
                 <div class="question-card">
-                    <h5 class="question-title">{{ $question->text_ru }}</h5>
+                    <h5 class="question-title">{{ $question->text }}</h5>
 
-                    @if ($question->type === 'text')
-                        <form class="vote-form" data-question-id="{{ $question->id }}">
+                    @if ($question->options->isEmpty() && $question->type === 'text')
+                        <form class="vote-form" data-question-id="{{ $question->id }}" method="post" action="javascript:void(0)" onsubmit="return false;">
                             @csrf
-                            <textarea name="text_answer" 
-                                      class="survey-textarea" 
-                                      placeholder="Введите ваш ответ здесь..."
-                                      required></textarea>
-                            <button type="submit" class="vote-btn">Отправить</button>
+                            <textarea name="text_answer" class="survey-textarea" placeholder="Введите ваш ответ здесь..." required></textarea>
+                            <button type="submit" class="vote-btn">@trans('send_button')</button>
                             <div class="vote-result" style="display:none"></div>
                         </form>
                     @else
-                        <form class="vote-form" data-question-id="{{ $question->id }}">
+                        <form class="vote-form" data-question-id="{{ $question->id }}" data-question-type="{{ $question->type }}" method="post" action="javascript:void(0)" onsubmit="return false;">
                             @csrf
                             <div class="options">
                                 @foreach ($question->options as $opt)
-                                    <label class="option-label">
-                                        <input type="{{ $question->type }}" 
-                                               name="option" 
-                                               value="{{ $opt->id }}">
-                                        <span class="option-text">{{ $opt->text_ru }}</span>
-                                        <span class="option-count" data-option-id="{{ $opt->id }}">
-                                            {{ $opt->answers()->count() }}
-                                        </span>
-                                    </label>
+                                    @if(($opt->type ?? 'choice') === 'text')
+                                        <div class="option-item option-item--text mb-3">
+                                            <label class="d-block small text-muted mb-1">{{ $opt->text }}</label>
+                                            <textarea name="text_answers[{{ $opt->id }}]" class="survey-textarea" placeholder="{{ $opt->text }}" rows="2"></textarea>
+                                        </div>
+                                    @else
+                                        @php $inputType = ($question->type === 'checkbox') ? 'checkbox' : 'radio'; @endphp
+                                        <label class="option-label">
+                                            <input type="{{ $inputType }}" name="option" value="{{ $opt->id }}" aria-label="{{ $opt->text }}">
+                                            <span class="option-text">{{ $opt->text }}</span>
+                                            <span class="option-count" data-option-id="{{ $opt->id }}">{{ $opt->answers()->count() }}</span>
+                                        </label>
+                                    @endif
                                 @endforeach
                             </div>
-                            <button type="submit" class="vote-btn">Голосовать</button>
+                            <button type="submit" class="vote-btn">@trans('vote')</button>
                             <div class="vote-result" style="display:none"></div>
                         </form>
                     @endif
@@ -99,146 +96,6 @@
     </div>
 </section>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const surveyId = {{ $survey->id }};
-    const voteUrl = "{{ url('survey') }}/" + surveyId + "/vote";
-    
-    document.querySelectorAll('.vote-form').forEach(form => {
-        form.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const questionId = this.dataset.questionId;
-            const questionCard = this.closest('.question-card');
-            const type = this.querySelector('input[type="radio"], input[type="checkbox"]') ? 'choice' : 'text';
-            let optionId = null;
-            let textAnswer = null;
-
-            if (type === 'choice') {
-                const checked = this.querySelector('input[name="option"]:checked');
-                if (!checked) {
-                    alert('Пожалуйста, выберите вариант ответа');
-                    return;
-                }
-                optionId = checked.value;
-            } else {
-                textAnswer = this.querySelector('textarea[name="text_answer"]').value.trim();
-                if (!textAnswer) {
-                    alert('Пожалуйста, введите ваш ответ');
-                    return;
-                }
-            }
-
-            const token = document.querySelector('meta[name="csrf-token"]').content;
-            const button = this.querySelector('button[type="submit"]');
-            const originalButtonText = button.textContent;
-            
-            button.disabled = true;
-            button.textContent = 'Отправка...';
-
-            try {
-                console.log('Sending vote to:', voteUrl);
-                console.log('Data:', {
-                    question_id: questionId,
-                    option_id: optionId,
-                    text_answer: textAnswer
-                });
-
-                const res = await fetch(voteUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': token,
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        question_id: questionId,
-                        option_id: optionId,
-                        text_answer: textAnswer
-                    })
-                });
-                
-                console.log('Response status:', res.status);
-                const data = await res.json();
-                console.log('Response data:', data);
-                
-                if (!res.ok) {
-                    alert(data.message || 'Произошла ошибка при отправке голоса');
-                    button.disabled = false;
-                    button.textContent = originalButtonText;
-                    return;
-                }
-
-                // Скрываем форму
-                this.style.display = 'none';
-
-                // Создаем блок статистики
-                let statsHtml = '<div class="vote-statistics">';
-                statsHtml += '<h6 class="text-success mb-3">✓ Спасибо за участие!</h6>';
-                
-                if (data.counts && data.counts.length > 0) {
-                    statsHtml += '<div class="stats-bars">';
-                    const totalVotes = data.total || data.counts.reduce((sum, c) => sum + parseInt(c.votes), 0);
-                    
-                    data.counts.forEach(c => {
-                        const percentage = totalVotes > 0 ? Math.round((c.votes / totalVotes) * 100) : 0;
-                        statsHtml += `
-                            <div class="stat-item mb-3">
-                                <div class="d-flex justify-content-between mb-1">
-                                    <span class="stat-label">${c.option_text || 'Вариант'}</span>
-                                    <span class="stat-value">${c.votes} голосов (${percentage}%)</span>
-                                </div>
-                                <div class="progress" style="height: 25px; border-radius: 10px;">
-                                    <div class="progress-bar bg-success" role="progressbar" 
-                                         style="width: ${percentage}%; transition: width 1s ease;"
-                                         aria-valuenow="${percentage}" aria-valuemin="0" aria-valuemax="100">
-                                    </div>
-                                </div>
-                            </div>
-                        `;
-                    });
-                    
-                    statsHtml += '</div>';
-                    statsHtml += `<p class="text-muted mt-3">Всего проголосовало: ${totalVotes}</p>`;
-                } else {
-                    statsHtml += '<p class="text-success">Ваш ответ принят!</p>';
-                }
-                
-                statsHtml += '</div>';
-
-                // Добавляем статистику в карточку вопроса
-                questionCard.insertAdjacentHTML('beforeend', statsHtml);
-
-                // Через 15 секунд скрываем статистику и показываем форму снова
-                setTimeout(() => {
-                    const statsBlock = questionCard.querySelector('.vote-statistics');
-                    if (statsBlock) {
-                        statsBlock.style.transition = 'opacity 0.5s ease';
-                        statsBlock.style.opacity = '0';
-                        
-                        setTimeout(() => {
-                            statsBlock.remove();
-                            // Показываем форму снова и сбрасываем её
-                            this.style.display = 'block';
-                            this.reset();
-                            button.disabled = false;
-                            button.textContent = originalButtonText;
-                            // Снимаем disabled со всех полей
-                            this.querySelectorAll('input, textarea').forEach(el => el.disabled = false);
-                        }, 500);
-                    }
-                }, 15000); // 15 секунд
-
-            } catch (err) {
-                console.error('Error:', err);
-                alert('Ошибка сети. Пожалуйста, попробуйте позже.');
-                button.disabled = false;
-                button.textContent = originalButtonText;
-            }
-        });
-    });
-});
-
-</script>
+{{-- Голосование обрабатывается скриптом в master.blade.php (поддержка option_id + text_answers) --}}
 
 @endsection

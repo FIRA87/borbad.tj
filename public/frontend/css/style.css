@@ -637,6 +637,132 @@ text-decoration: underline !important;
         margin-bottom: 2rem;
     }
 
+    /* Слайдер опроса: один вопрос на экран, навигация стрелками */
+    .survey-slider {
+        position: relative;
+    }
+    .survey-slider__track {
+        position: relative;
+        min-height: 180px;
+    }
+    .survey-slider__slide {
+        display: none;
+        animation: surveySlideIn 0.3s ease;
+    }
+    .survey-slider__slide--active {
+        display: block;
+    }
+    .survey-slider .survey-slider__slide.question-card {
+        margin-bottom: 0;
+    }
+    .survey-slider__nav {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1.75rem;
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e9ecef;
+    }
+    .survey-slider__arrow {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        border: 2px solid #27ae60;
+        background: #fff;
+        color: #27ae60;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        margin: 0;
+        font-size: 1.35rem;
+        line-height: 1;
+        box-shadow: 0 2px 8px rgba(39, 174, 96, 0.15);
+        transition: background 0.25s ease, color 0.25s ease, transform 0.2s ease, box-shadow 0.25s ease;
+        -webkit-appearance: none;
+        appearance: none;
+    }
+    .survey-slider__arrow:hover:not(:disabled) {
+        background: #27ae60;
+        color: #fff;
+        transform: scale(1.08);
+        box-shadow: 0 4px 14px rgba(39, 174, 96, 0.35);
+    }
+    .survey-slider__arrow:active:not(:disabled) {
+        transform: scale(1.02);
+        box-shadow: 0 2px 8px rgba(39, 174, 96, 0.25);
+    }
+    .survey-slider__arrow:focus {
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(39, 174, 96, 0.25);
+    }
+    .survey-slider__arrow:focus:not(:disabled):hover {
+        box-shadow: 0 4px 14px rgba(39, 174, 96, 0.35), 0 0 0 3px rgba(39, 174, 96, 0.2);
+    }
+    .survey-slider__arrow:disabled {
+        border-color: #ced4da;
+        color: #adb5bd;
+        background: #f1f3f5;
+        box-shadow: none;
+        cursor: not-allowed;
+    }
+    .survey-slider__counter {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #2c3e50;
+        min-width: 3ch;
+        text-align: center;
+    }
+
+    /* Блок «Ваши ответы» — накопленный отчёт по каждому голосу */
+    .survey-my-results {
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e9ecef;
+    }
+    .survey-my-results__heading {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #2c3e50;
+        margin-bottom: 0.75rem;
+    }
+    .survey-my-results__list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .survey-my-results__item {
+        font-size: 0.9375rem;
+        color: #495057;
+        padding: 0.5rem 0.75rem;
+        background: #f0fdf4;
+        border-radius: 10px;
+        border-left: 3px solid #27ae60;
+    }
+    .survey-my-results__title,
+    .survey-my-results__question-title {
+        font-weight: 600;
+        color: #2c3e50;
+    }
+    .survey-my-results__question-title {
+        font-size: 1.05rem;
+        margin-bottom: 0.5rem;
+    }
+    .survey-my-results__summary {
+        color: #27ae60;
+    }
+    .survey-my-results__your-answer {
+        color: #1e3a5f;
+        font-style: italic;
+    }
+
+    @keyframes surveySlideIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
     .survey-title {
         font-size: 1.5rem;
         font-weight: 700;
@@ -686,7 +812,8 @@ text-decoration: underline !important;
     }
 
     .option-label input[type="radio"],
-    .option-label input[type="checkbox"] {
+    .option-label input[type="checkbox"],
+    .option-label .option-input {
         width: 24px;
         height: 24px;
         margin-right: 1rem;
@@ -732,7 +859,7 @@ text-decoration: underline !important;
         background: #27ae60;
         color: white;
         border: none;
-        padding: 0.875rem 2.5rem;
+        padding: 0.875rem 0.5rem;
         border-radius: 10px;
         font-size: 1rem;
         font-weight: 600;

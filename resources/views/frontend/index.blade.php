@@ -1,621 +1,1037 @@
 @extends('frontend.master')
-@section('content')
-@php
-	$latestNews = App\Models\News::orderBy('publish_date', 'desc')->limit(3)->get();
-@endphp
 
+@section('title', 'Борбад - Театрально-концертный зал')
 
-<!-- Hero -->
-<section class="py-5">
-  <div class="container">
-    <div class="row g-4 align-items-stretch">
-          
-      <div class="col-12 col-lg-8">
-        
-        <div class="hero-card bg-light small-card position-relative" id="heroSlider">
-             @if (is_countable($sliders) && count($sliders) > 0)
-                @foreach ($sliders as $key => $news)
-          <div class="hero-bg {{ $key === 0 ? 'active' : '' }}" style="background-image:url('{{ asset($news->image) }}')">
-            <div>
-              <div class="hero-title">
-                    @if (session()->get('lang') == 'ru')
-                        {{ $news->title_ru }}
-                    @elseif(session()->get('lang') == 'en')
-                        {{ $news->title_en }}
-                    @else                 
-                        {{ $news->title_tj }}
-                    @endif
-              </div>
-              <div class="mt-3"><a href="{{ url('news/details/' . $news->id ) }}" class="btn btn-sm">@trans('read_more') →</a></div>
-            </div>
-          </div>
-             @endforeach
-            @endif
-        </div>
-       
-      </div>
-       
-      <div class="col-12 col-lg-4">
-         @if (is_countable($prezident) && count($prezident) > 0)
-                @foreach ($prezident as $item)
-        <div class="small-card h-100 bg-white shadow-sm">
-          <img src="{{ asset($item->image) }}" alt="portrait" style="width:100%;object-fit:cover;border-radius:8px;"/>        
-          <p class="text-muted small" style="padding: 10px;">
-             <a href="{{ url('prezident/detail/' . $item->id ) }}" class="text-decoration-none" style="color: #000 !important; text-decoration: none !important;padding: 10px;"> 
-              @if (session()->get('lang') == 'ru')              
-                    {!! Str::limit(strip_tags($item->text_ru), 200) !!}
-                @elseif(session()->get('lang') == 'en')
-                    {!! Str::limit(strip_tags($item->text_en), 200) !!}
-                @else                 
-                  {!! Str::limit(strip_tags($item->text_tj), 200) !!}
-                @endif</a>
-          </p>
-        </div>
-           @endforeach
-            @endif
-      </div>
-    </div>
-  </div>
-</section>
+@push('styles')
+    <style>
+        /* ===== Hero Banner ===== */
+        .hero-banner {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            min-height: 560px;
+            background: var(--dark-bg);
+            overflow: hidden;
+        }
 
-
-<!-- Секция "Основные обязанности" -->
-
-@if($home_page2 && $home_page2->tasks->count() > 0)
-<section class="py-5 py-md-6" style="background: #F7F5EF;">
-    <div class="container">
-        <!-- Заголовок + ссылка "Узнать больше" -->
-        <div class="row align-items-start mb-4 mb-md-5">
-            <div class="col-lg-10 col-12">
-                <h2 class="fw-bold text-uppercase mb-3 mb-md-4" 
-                    style="font-size: clamp(28px, 5vw, 36px);">
-                     @trans('main_responsibilities')
-                </h2>
-
-                <p class="text-muted mb-4 mb-md-0" style="font-size: clamp(15px, 2.5vw, 15px); line-height: 1.8;">
-                    @if(session()->get('lang') == 'ru')
-                        {!! Str::limit(strip_tags($home_page2->news_details_ru), 250) !!}
-                    @elseif(session()->get('lang') == 'en')
-                        {!! Str::limit(strip_tags($home_page2->news_details_en), 250) !!}
-                    @else
-                        {!! Str::limit(strip_tags($home_page2->news_details_tj), 250) !!}
-                    @endif
-                </p>
-            </div>
-
-            <!-- Ссылка "Узнать больше" — на мобильных под текстом, на десктопе справа -->
-            <div class="col-lg-2 col-12 text-lg-end mt-3 mt-lg-0">
-                <a href="{{ url('news/details/'.$home_page2->id) }}" class="fw-semibold d-inline-block" style="color:#0A8250; text-decoration:none; font-size: clamp(15px, 2.5vw, 15px);">
-                     @trans('learn_more') →
-                    
-                </a>
-            </div>
-        </div>
-
-        <!-- Сбор всех элементов задач -->
-        @php
-            $allItems = collect();
-            foreach($home_page2->tasks as $task) {
-                if($task->items) {
-                    $allItems = $allItems->merge($task->items);
-                }
+        @media (max-width: 1024px) {
+            .hero-banner {
+                grid-template-columns: 1fr;
+                min-height: auto;
             }
-        @endphp
+        }
 
-        <!-- Карточки -->
-        <div class="row g-4 g-xl-5">
-            @foreach($allItems as $index => $item)
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="p-4 rounded-4 shadow-sm h-100 d-flex align-items-start gap-3 gap-md-4" style="background:#FFFFFF; border:1px solid #E8E5D9; min-height: 120px;">
-                        
-                        <!-- Круглый номер — адаптивный размер -->
-                        <div class="flex-shrink-0 d-flex align-items-center justify-content-center rounded-circle text-white fw-bold"
-                             style="width: clamp(48px, 8vw, 56px); 
-                                    height: clamp(48px, 8vw, 56px); 
-                                    background: #3B8A3F; 
-                                    font-size: clamp(16px, 3vw, 18px);">
-                            {{ str_pad($index + 1, 2, '0', STR_PAD_LEFT) }}
+        /* Слайдер часть */
+        .hero-slider-wrapper {
+            position: relative;
+            overflow: hidden;
+            min-height: 560px;
+        }
+
+        @media (max-width: 1024px) {
+            .hero-slider-wrapper {
+                min-height: 400px;
+            }
+        }
+
+        .hero-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+            background-size: cover;
+            background-position: center;
+        }
+
+        .hero-slide.active {
+            opacity: 1;
+        }
+
+        .hero-slide::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(to top, rgba(15, 14, 12, 0.8) 0%, rgba(15, 14, 12, 0.1) 40%, rgba(15, 14, 12, 0.3) 100%),
+                linear-gradient(to right, rgba(15, 14, 12, 0.3) 0%, transparent 50%);
+        }
+
+        .hero-slide-caption {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            padding: 40px 60px;
+            text-align: center;
+        }
+
+        .hero-slide-caption h2 {
+            font-family: var(--font-display, Georgia, serif);
+            font-size: clamp(1.75rem, 4vw, 2.75rem);
+            font-weight: 700;
+            color: #fff;
+            text-shadow: 0 2px 20px rgba(0, 0, 0, 0.6), 0 0 40px rgba(0, 0, 0, 0.4);
+            line-height: 1.25;
+            max-width: 720px;
+            margin: 0;
+        }
+
+        .hero-slide-caption .hero-slide-link {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 24px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--dark-bg);
+            background: var(--gold);
+            border-radius: 8px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .hero-slide-caption .hero-slide-link:hover {
+            background: var(--gold-light, #d4af37);
+            color: var(--dark-bg);
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 768px) {
+            .hero-slide-caption {
+                padding: 24px 20px;
+            }
+        }
+
+        /* Навигация слайдера */
+        .slider-arrow {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 20;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .slider-arrow:hover {
+            background: var(--gold);
+            color: var(--dark-bg);
+            border-color: var(--gold);
+        }
+
+        .slider-arrow.prev {
+            left: 20px;
+        }
+
+        .slider-arrow.next {
+            right: 20px;
+        }
+
+        .slider-dots {
+            position: absolute;
+            bottom: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 20;
+        }
+
+        .slider-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .slider-dot.active {
+            background: var(--gold);
+            border-color: var(--gold);
+            transform: scale(1.3);
+        }
+
+        /* Боковой блок (цитата президента) */
+        .hero-side-block {
+            background: var(--dark-surface);
+            display: flex;
+            flex-direction: column;
+            border-left: 1px solid var(--dark-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        @media (max-width: 1024px) {
+            .hero-side-block {
+                border-left: none;
+                border-top: 1px solid var(--dark-border);
+            }
+        }
+
+        .hero-side-block::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--gold), transparent);
+            z-index: 2;
+        }
+
+        @media (max-width: 1024px) {
+            .hero-side-block::before {
+                width: 100%;
+                height: 2px;
+                background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            }
+        }
+
+        /* Фото президента */
+        .prezident-photo {
+            width: 100%;
+            overflow: hidden;
+            flex-shrink: 0;
+            padding: 16px 16px 0;
+        }
+
+        .prezident-photo img {
+            width: 100%;
+            height: 380px;
+            object-fit: cover;
+            object-position: top center;
+            display: block;
+            border-radius: 10px;
+            border: 2px solid var(--gold);
+        }
+
+        .prezident-photo-placeholder {
+            width: 100%;
+            height: 220px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--dark-card), var(--dark-bg));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Карточка цитаты */
+        .quote-card {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 12px;
+            padding: 24px 20px 18px;
+            margin: 14px 16px;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .quote-card::before {
+            content: '\201C';
+            position: absolute;
+            top: -8px;
+            left: 16px;
+            font-size: 3.5rem;
+            color: var(--gold);
+            opacity: 0.2;
+            font-family: 'Playfair Display', serif;
+            line-height: 1;
+        }
+
+        .quote-card p {
+            font-size: 0.92rem;
+            line-height: 1.7;
+        }
+
+        @media (max-width: 1024px) {
+            .quote-card {
+                margin: 12px 16px;
+            }
+
+            .prezident-photo img,
+            .prezident-photo-placeholder {
+                height: 200px;
+            }
+        }
+
+        /* ===== Секции ===== */
+        .section-dark {
+            background: var(--dark-bg);
+            position: relative;
+        }
+
+        .section-surface {
+            background: var(--dark-surface);
+            position: relative;
+        }
+
+        /* Тонкий переход между секциями */
+        .section-surface+.section-dark::before,
+        .section-dark+.section-surface::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 10%;
+            right: 10%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, var(--dark-border), transparent);
+        }
+
+        /* ===== Video Modal ===== */
+        .video-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 9998;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+
+        .video-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        /* ===== Contact Form ===== */
+        .contact-form-wrapper {
+            background: linear-gradient(180deg, var(--dark-card) 0%, rgba(24, 22, 20, 0.95) 100%);
+            border: 1px solid var(--dark-border);
+            border-radius: 20px;
+            padding: 48px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.3);
+        }
+
+        .contact-form-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        @media (max-width: 768px) {
+            .contact-form-wrapper {
+                padding: 28px 20px;
+            }
+        }
+
+        .index-timeline-line {
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--gold), var(--dark-border));
+        }
+
+        .index-timeline-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--gold);
+            border: 2px solid var(--dark-bg);
+            position: absolute;
+            left: -24px;
+            top: 22px;
+            transform: translateX(-50%);
+            z-index: 2;
+        }
+
+        .index-timeline-card {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-bottom: 12px;
+        }
+
+        .index-timeline-card:hover {
+            border-color: var(--gold);
+        }
+
+        /* ===== Полезные ссылки ===== */
+        .partner-links-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 1024px) {
+            .partner-links-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 480px) {
+            .partner-links-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+        }
+
+        .partner-link-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 28px 16px;
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 14px;
+            text-decoration: none;
+            transition: border-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .partner-link-card:hover {
+            border-color: var(--gold);
+            transform: translateY(-4px);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .partner-link-logo {
+            width: 80px;
+            height: 80px;
+            object-fit: contain;
+            filter: brightness(0.9);
+            transition: filter 0.3s ease;
+        }
+
+        .partner-link-card:hover .partner-link-logo {
+            filter: brightness(1);
+        }
+
+        .partner-link-logo-placeholder {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--dark-surface), var(--dark-bg));
+            border: 2px solid var(--dark-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .partner-link-name {
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-align: center;
+            line-height: 1.4;
+            transition: color 0.3s ease;
+        }
+
+        .partner-link-card:hover .partner-link-name {
+            color: var(--gold);
+        }
+    </style>
+@endpush
+
+@section('content')
+    <!-- ===== Hero Banner: Слайдер + Боковой блок ===== -->
+    <section class="hero-banner">
+        {{-- Левая часть — Слайдер --}}
+        <div class="hero-slider-wrapper" id="heroSlider">
+            @if (isset($sliders) && $sliders->count())
+                @foreach ($sliders as $i => $slide)
+                    <div class="hero-slide {{ $i === 0 ? 'active' : '' }}"
+                        style="background-image: url('{{ asset($slide->image) }}');">
+                        <div class="hero-slide-caption">
+                            <div>
+                                <h2>
+                                    <a href="{{ url('news/details/' . $slide->id) }}" class="hero-slide-link">
+
+                                        @if (session()->get('lang') == 'ru')
+                                            {{ $slide->title_ru }}
+                                        @elseif(session()->get('lang') == 'en')
+                                            {{ $slide->title_en }}
+                                        @else
+                                            {{ $slide->title_tj }}
+                                        @endif
+
+                                    </a>
+                                </h2>
+
+
+                            </div>
                         </div>
-
-                        <!-- Текст -->
-                        <div style="flex-grow:1;">
-                            <p class="m-0" style="font-size: clamp(15px, 2.5vw, 15px); line-height: 1.65;">
-                                @if(session()->get('lang') == 'ru')
-                                    {!! $item->text_ru !!}
+                    </div>
+                @endforeach
+            @else
+                <div class="hero-slide active"
+                    style="background: linear-gradient(135deg, var(--dark-surface), var(--dark-bg));">
+                    <div class="absolute inset-0 flex items-center justify-center z-10">
+                        <div class="text-center">
+                            <h2 class="display-font text-5xl font-bold text-white mb-4">
+                                @if (session()->get('lang') == 'ru')
+                                    {{ $news->title_ru }}
                                 @elseif(session()->get('lang') == 'en')
-                                    {!! $item->text_en !!}
+                                    {{ $news->title_en }}
                                 @else
-                                    {!! $item->text_tj !!}
+                                    {{ $news->title_tj }}
                                 @endif
-                            </p>
+                            </h2>
+
                         </div>
                     </div>
                 </div>
-            @endforeach
+            @endif
+
+            {{-- Стрелки навигации --}}
+            @if (isset($sliders) && $sliders->count() > 1)
+                <button class="slider-arrow prev" id="sliderPrev" aria-label="Предыдущий слайд">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <button class="slider-arrow next" id="sliderNext" aria-label="Следующий слайд">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
+                </button>
+
+                {{-- Точки --}}
+                <div class="slider-dots" id="sliderDots">
+                    @foreach ($sliders as $i => $slide)
+                        <button class="slider-dot {{ $i === 0 ? 'active' : '' }}"
+                            data-index="{{ $i }}"></button>
+                    @endforeach
+                </div>
+            @endif
         </div>
 
-        <!-- Кнопка "Показать все" — только если больше 6 элементов -->
-        @if($allItems->count() > 6)
-            <div class="text-center mt-5 mt-md-6">
-                <a href="{{ url('news/details/'.$home_page2->id.'/'.$home_page2->slug) }}"
-                   class="btn btn-outline-success btn-lg px-5 py-3"
-                   style="font-size: clamp(16px, 3vw, 18px);">
-                     @trans('show_all_responsibilities')
-                </a>
-            </div>
-        @endif
-    </div>
-</section>
-@endif
-
-
-<!-- Деятельность -->
-
-<section class="py-5 bg-light">
-    <div class="container">
-
-        @foreach($home_page as $item)
-            <div class="mb-4 d-flex justify-content-between align-items-center flex-wrap">
-                <h2 class="section-title mb-2 mb-md-0">
-                    @if(session()->get('lang') == 'ru')
-                        {{ $item->title_ru }}
-                    @elseif(session()->get('lang') == 'en')
-                        {{ $item->title_en }}
-                    @else
-                        {{ $item->title_tj }}
-                    @endif
-                </h2>
-                <a href="{{ url('news/details/' . $item->id ) }}" class="btn btn-outline-success btn-sm">
-                   @trans('learn_more')
-                </a>
-            </div>
-
-            <p class="text-muted mb-4">
-                @if(session()->get('lang') == 'ru')
-                    {!! Str::limit(strip_tags($item->news_details_ru), 250) !!}
-                @elseif(session()->get('lang') == 'en')
-                    {!! Str::limit(strip_tags($item->news_details_en), 250) !!}
-                @else
-                    {!! Str::limit(strip_tags($item->news_details_tj), 250) !!}
-                @endif
-            </p>
-
-            <!-- Галерея -->
-            <div class="row g-3">
-                @forelse($item->images as $img)
-                    <div class="col-lg-4 col-md-6 col-sm-12">
-                        <div class=" overflow-hidden shadow-soft position-relative">
-                            <img src="{{ asset($img->image) }}" class="img-fluid w-100 object-fit-cover rounded-3" style="height: 200px; transition: transform 0.3s ease;"  alt="Галерея">
-                            <div class="position-absolute bottom-0 start-0 end-0" style="height: 50%; background: linear-gradient(transparent, rgba(0,0,0,0.25)); border-radius: 0 0 12px 12px;"></div>
-                        </div>
+        {{-- Правая часть — Блок с цитатой президента --}}
+        <div class="hero-side-block">
+            @if (is_countable($prezident) && count($prezident) > 0)
+                @foreach ($prezident as $item)
+                    {{-- Фото президента --}}
+                    <div class="prezident-photo">
+                        @if ($item->image)
+                            <img src="{{ asset($item->image) }}" alt="portrait">
+                        @else
+                            <div class="prezident-photo-placeholder">
+                                <svg class="w-16 h-16 text-gray-500" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                        @endif
                     </div>
-                @empty
-                    <div class="col-12 text-center py-5 text-muted">
-                        <i class="bi bi-images" style="font-size: 3.5rem; opacity: 0.2;"></i>
-                        <p class="mt-3">Дополнительные фотографии отсутствуют</p>
-                    </div>
-                @endforelse
-            </div>
-        @endforeach
 
-    </div>
-</section>
-
-<!-- Проекты -->
-
-<section class="py-5 bg-light">
-    <div class="container">
-        <h2 class="section-title">@trans('projects')</h2>
-
-        <div class="row g-4">
-            @foreach($projects as $project)
-                <div class="col-lg-12 col-md-6 col-sm-12">
-                    <div class="project-item shadow-soft d-flex flex-column flex-md-row gap-3 p-3">
-                        <!-- Изображение проекта -->
-                        <div class="flex-shrink-0">
-                            <img src="{{ $project->image }}" alt="{{ $project->title_ru }}" class="rounded-img object-fit-cover">
-                        </div>
-
-                        <!-- Текст -->
-                        <div class="flex-grow-1 d-flex flex-column justify-content-between">
-                            <h5 class="mb-2">
+                    {{-- Цитата --}}
+                    <div class="quote-card">
+                        <a href="{{ url('prezident/detail/' . $item->id) }}" class="block">
+                            <p class="body-font leading-relaxed mb-4"
+                                style="color: var(--text-secondary); text-indent: 1.2em;">
                                 @if (session()->get('lang') == 'ru')
-                                    {{ $project->title_ru }}
+                                    {!! Str::limit(strip_tags($item->text_ru), 200) !!}
                                 @elseif(session()->get('lang') == 'en')
-                                    {{ $project->title_en }}
+                                    {!! Str::limit(strip_tags($item->text_en), 200) !!}
                                 @else
-                                    {{ $project->title_tj }}
-                                @endif
-                            </h5>
-                            <p class="text-muted mb-3" style="font-size: 0.9rem;">
-                                @if (session()->get('lang') == 'ru')
-                                    {{ \Illuminate\Support\Str::limit(strip_tags($project->text_ru), 180) }}
-                                @elseif(session()->get('lang') == 'en')
-                                    {{ \Illuminate\Support\Str::limit(strip_tags($project->text_en), 180) }}
-                                @else
-                                    {{ \Illuminate\Support\Str::limit(strip_tags($project->text_tj), 180) }}
+                                    {!! Str::limit(strip_tags($item->text_tj), 200) !!}
                                 @endif
                             </p>
-                            <a href="{{ route('frontend.project.detail', $project->id) }}" class="btn btn-outline-success align-self-start">
-                               @trans('read_more')
+                        </a>
+                        <div class="flex items-center gap-2">
+
+                            <a href="{{ url('prezident/detail/' . $item->id) }}" class="text-sm hover:underline transition"
+                                style="color: var(--gold); list-style: none;">
+                                @trans('read_more') →
                             </a>
                         </div>
                     </div>
-                </div>
-            @endforeach
+                @endforeach
+            @endif
+
+            {{-- Быстрые ссылки --}}
+            <div class="flex flex-col gap-2 px-4 pb-4">
+                <a href="https://prezident.tj" class="btn-primary text-center text-xs py-2.5 tracking-wide">
+                    prezident.tj
+                </a>
+
+            </div>
         </div>
-    </div>
-</section>
+    </section>
 
+    <!-- ===== Ближайшие события ===== -->
+    <section class="py-20 px-6 section-surface">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center mb-14">
+                <p class="text-sm uppercase tracking-widest mb-3" style="color: var(--gold);"> @trans('upcoming_events')</p>
 
+                <div class="gold-divider"></div>
+                <p class="section-subtitle"> @trans('outstanding_performances_title')</p>
+            </div>
 
-
-<!-- СЕКЦИЯ НОВОСТЕЙ - НАЧАЛО -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-           <h2 class="section-title mb-2 mb-md-0">
-               <a href="{{ route('frontend.news') }}" class="fw-semibold" style="color: #000 !important; text-decoration: none !important;"> 
-              @trans('main_news')
-               </a>
-            </h2>
-           
-             
-            
-        </div>
-
-        <div class="row g-4">  
-            @foreach($latestNews as $news)  
-                <div class="col-12 col-md-4">
-                    <div class="card h-100 shadow-sm border-0 rounded-4 overflow-hidden">
-                        <div class="position-relative">               
-            			     @if($news->images && $news->images->isNotEmpty())
-                                <img src="{{ asset($news->images->first()->image) }}" class="card-img-top" style="height:220px; object-fit:cover;" alt="{{ $news->title_ru ?? $news->title_tj }}">
-                            @else
-                                {{-- Placeholder если нет изображений --}}
-                                <img src="{{ asset('upload/no-image.jpg') }}" 
-                                     class="card-img-top" 
-                                     style="height:220px; object-fit:cover;"
-                                     alt="No image">
-                            @endif
-            				
-            				
-                            <div class="position-absolute bottom-0 start-0 end-0" style="height:40%; background: linear-gradient(transparent, rgba(0,0,0,0.55));"></div>
-                        </div>
-                        <div class="card-body d-flex flex-column">
-                            <p class="text-muted small mb-2">{{ $news->publish_date }}</p>
-                            <h5 class="fw-bold mb-3">
-                                @if (session()->get('lang') == 'ru') 
-            						{{ $news->title_ru }}
-                                   @elseif(session()->get('lang') == 'en')
-            						{{ $news->title_en }}
-                                @else 
-            						{{ $news->title_tj }}
-                                @endif
-                            </h5>
-                            <p class="text-muted mb-4">
-                              @if (session()->get('lang') == 'ru') 
-            						{!! Str::limit(strip_tags($news->news_details_ru ?? ''), 120) !!}
-                                    @elseif(session()->get('lang') == 'en')
-            						{!! Str::limit(strip_tags($news->news_details_en ?? ''), 120) !!}
-                                @else 
-            						{!! Str::limit(strip_tags($news->news_details_tj ?? ''), 120) !!}
-                                @endif
-                            </p>
-                            <a href="{{ url('news/details/' . $news->id ) }}" class="mt-auto fw-semibold text-success">@trans('read_more') → </a>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-
-           
-        </div>
-    </div>
-</section>
-<!-- СЕКЦИЯ НОВОСТЕЙ - КОНЕЦ -->
-
-
-
-
-<!-- СЕКЦИЯ VIDEO - КОНЕЦ -->
-<section class="py-5 bg-light">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="section-title fw-bold">@trans('main_video')    </h2>
-            <a href="{{ url('/videos') }}" class="text-decoration-none text-success">  @trans('all_video') →  </a>
-        </div>
-        
-        <div class="row g-3">
-            @foreach($videos as $video)
-                @php
-                    // Конвертируем YouTube URL в embed формат
-                    $videoUrl = $video->video_url;
-                    
-                    // Получаем YouTube ID из разных форматов URL
-                    if (preg_match('/(?:youtube\.com\/(?:[^\/]+\/.+\/|(?:v|e(?:mbed)?)\/|.*[?&]v=)|youtu\.be\/)([^"&?\/\s]{11})/i', $videoUrl, $matches)) {
-                        $youtubeId = $matches[1];
-                        $embedUrl = "https://www.youtube.com/embed/{$youtubeId}?autoplay=1";
-                        $thumbnail = "https://img.youtube.com/vi/{$youtubeId}/maxresdefault.jpg";
-                    } else {
-                        // Если уже embed формат или другой источник
-                        $embedUrl = $videoUrl;
-                        $thumbnail = asset($video->thumbnail ?? 'upload/no-image.jpg');
-                    }
-                @endphp
-                
-                <div class="col-12 col-md-6 col-lg-4">
-                    <div class="video-card position-relative overflow-hidden rounded-4" 
-                         data-bs-toggle="modal" 
-                         data-bs-target="#videoModal{{ $video->id }}">
-                        <!-- Превью видео -->
-                        <img src="{{ $thumbnail }}"
-                             alt="{{ $video->title_ru }}"
-                             class="video-thumbnail"
-                             onerror="this.src='{{ asset('upload/no-image.jpg') }}'">
-                        
-                        <!-- Затемнение -->
-                        <div class="video-overlay"></div>
-                        
-                        <!-- Кнопка Play -->
-                        <div class="video-play-btn">
-                            <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
-                                <rect width="60" height="60" rx="8" fill="white" fill-opacity="0.9"/>
-                                <path d="M24 20L40 30L24 40V20Z" fill="#333"/>
-                            </svg>
-                        </div>
-                        
-                        <!-- Заголовок (опционально) -->
-                        @if(isset($video->title_ru))
-                        <div class="video-title">
-                            @if (session('lang') == 'ru')
-                                {{ Str::limit($video->title_ru, 200) }}
-                            @elseif(session('lang') == 'en')
-                                {{ Str::limit($video->title_en ?? $video->title_ru, 200) }}
-                            @else
-                                {{ Str::limit($video->title_tj ?? $video->title_ru, 200) }}
-                            @endif
-                        </div>
-                        @endif
-                    </div>
-                </div>
-                
-                <!-- Модальное окно для видео -->
-                <div class="modal fade" id="videoModal{{ $video->id }}" tabindex="-1">
-                    <div class="modal-dialog modal-lg modal-dialog-centered">
-                        <div class="modal-content bg-dark">
-                            <div class="modal-header border-0">
-                                <h5 class="modal-title text-white">
-                                    @if (session('lang') == 'ru')
-                                        {{ $video->title_ru ?? 'Видео' }}
-                                    @elseif(session('lang') == 'en')
-                                        {{ $video->title_en ?? $video->title_ru ?? 'Video' }}
-                                    @else
-                                        {{ $video->title_tj ?? $video->title_ru ?? 'Видео' }}
-                                    @endif
-                                </h5>
-                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-                            </div>
-                            <div class="modal-body p-0">
-                                <div class="ratio ratio-16x9">
-                                    <iframe src="" 
-                                            data-src="{{ $embedUrl }}"
-                                            class="video-iframe"
-                                            title="Video" 
-                                            frameborder="0"
-                                            allowfullscreen
-                                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share">
-                                    </iframe>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endforeach
-        </div>
-    </div>
-</section>
-
-
-<!-- Фотогалерея (КАРТОЧКИ) -->
-
-<section class="py-5 bg-white">
-    <div class="container">
-        <h2 class="section-title mb-5 text-center"> @trans('main_gallery')   </h2>
-        <div class="row g-4">
-            @foreach($galleries as $item)
-                <div class="col-sm-12 col-md-6 col-lg-4">
-                    <a href="{{ url('gallery/details/'.$item->id) }}" class="text-decoration-none">
-                        <div class="gallery-card shadow-sm rounded overflow-hidden position-relative">                            
-                            <div class="ratio ratio-1x1"><img src="/upload/cover/{{ $item->cover }}" class="w-100 h-100 gallery-img" alt=""></div>
-                            <div class="p-3 bg-white">
-                                <h5 class="mb-0 text-dark text-truncate">
-                                    @if(session('lang')=='ru') 
-                                        {{ $item->title_ru }}
-                                    @elseif(session('lang')=='en') 
-                                        {{ $item->title_en }}
-                                    @else 
-                                         {{ $item->title_tj }} 
-                                    @endif
-                                </h5>
-                            </div>
-                        </div>
-                    </a>
-                </div>
-            @endforeach
-        </div>
-
-    </div>
-</section>
-
-
-
-
-
-<!-- Руководство -->
-<div class="py-5 bg-light ">
-    <div class="container">
-        <div class="d-flex justify-content-between align-items-center mb-4">
-            <h2 class="fw-bold text-uppercase" style="font-size: 2rem; letter-spacing: 2px;">
-               @trans('leadership')
-            </h2>
-            <a href="{{ route('frontend.leader') }}" class="text-decoration-none text-muted hover-link">
-               @trans('learn_more')
-            </a>
-        </div>
-        
-        @if($leaders->count())
-            <div class="row g-4">
-                @foreach($leaders as $leader)
-                    <div class="col-12 col-sm-6 col-lg-3">
-                        <a href="{{ route('frontend.leader.detail', $leader->id) }}" class="text-decoration-none">
-                            <div class="leader-card position-relative overflow-hidden rounded-4 shadow-sm">
-                                <!-- Фото на весь размер -->
-                                @if($leader->image)
-                                    <img src="{{ asset($leader->image) }}"
-                                         alt="{{ session('lang')=='ru' ? $leader->title_ru : (session('lang')=='en' ? $leader->title_en : $leader->title_tj) }}"
-                                         class="leader-photo w-100">
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                @if (isset($news) && $news->count())
+                    @foreach ($news->take(3) as $item)
+                        <div class="event-card group">
+                            <div class="h-60 relative overflow-hidden">
+                                @if ($item->image)
+                                    <img src="{{ asset($item->image) }}" alt="{{ $item->title_ru }}"
+                                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110">
                                 @else
-                                    <div class="leader-photo w-100 bg-secondary d-flex align-items-center justify-content-center">
-                                        <i class="bi bi-person-circle text-white" style="font-size: 80px;"></i>
+                                    <div class="w-full h-full flex items-center justify-center"
+                                        style="background: linear-gradient(135deg, var(--dark-surface), var(--dark-bg));">
+                                        <svg class="w-16 h-16 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
+                                            <path
+                                                d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" />
+                                        </svg>
                                     </div>
                                 @endif
-                                
-                                <!-- Темный градиент снизу -->
-                                <div class="leader-overlay"></div>
-                                
-                                <!-- Текст поверх фото внизу -->
-                                <div class="leader-info">
-                                    <p class="leader-name mb-1 text-white fw-semibold">
-                                        @if (session('lang') == 'ru')
-                                            {{ $leader->title_ru }}
-                                        @elseif(session('lang') == 'en')
-                                            {{ $leader->title_en }}
-                                        @else
-                                            {{ $leader->title_tj }}
-                                        @endif
-                                    </p>
-                                  
+
+                                {{-- Дата-бейдж --}}
+                                <div class="absolute top-4 left-4 px-4 py-2 rounded-lg text-sm font-semibold"
+                                    style="background: rgba(15,14,12,0.85); backdrop-filter: blur(10px); color: var(--gold); border: 1px solid var(--dark-border);">
+                                    {{ \Carbon\Carbon::parse($item->publish_date)->format('Y-m-d') }}
                                 </div>
                             </div>
-                        </a>
-                    </div>
-                @endforeach
-            </div>
-        @else
-            <div class="alert alert-info text-center">
-                <i class="bi bi-info-circle me-2"></i>
-                Список руководства пуст
-            </div>
-        @endif
-    </div>
-</div>
 
+                            <div class="p-6">
+                                <h3 class="display-font text-xl font-bold text-white mb-3 line-clamp-2">
 
+                                    @if (session()->get('lang') == 'ru')
+                                        {{ $item->title_ru }}
+                                    @elseif(session()->get('lang') == 'en')
+                                        {{ $item->title_en }}
+                                    @else
+                                        {{ $item->title_tj }}
+                                    @endif
 
-<!-- Опросник -->
-<section class="survey-section">
-    <div class="container">
-        <div class="survey-card">        
+                                </h3>
 
-            @foreach ($survey->questions as $question)
-                <div class="question-card">
-                    <h5 class="question-title">{{ $question->text_ru }}</h5>
-
-                    @if ($question->type === 'text')
-                        <form class="vote-form" data-question-id="{{ $question->id }}">
-                            @csrf
-                            <textarea name="text_answer" 
-                                      class="survey-textarea" 
-                                      placeholder="Введите ваш ответ здесь..."
-                                      required></textarea>
-                            <button type="submit" class="vote-btn">@trans('send_button')</button>
-                            <div class="vote-result" style="display:none"></div>
-                        </form>
-                    @else
-                        <form class="vote-form" data-question-id="{{ $question->id }}">
-                            @csrf
-                            <div class="options">
-                                @foreach ($question->options as $opt)
-                                    <label class="option-label">
-                                        <input type="{{ $question->type }}" 
-                                               name="option" 
-                                               value="{{ $opt->id }}">
-                                        <span class="option-text">{{ $opt->text_ru }}</span>
-                                        <span class="option-count" data-option-id="{{ $opt->id }}">
-                                            {{ $opt->answers()->count() }}
-                                        </span>
-                                    </label>
-                                @endforeach
+                                <a href="{{ route('news_details', $item->id) }}"
+                                    class="inline-flex items-center gap-2 text-sm font-semibold transition-colors"
+                                    style="color: var(--gold);">
+                                    @trans('read_more')
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 5l7 7-7 7" />
+                                    </svg>
+                                </a>
                             </div>
-                            <button type="submit" class="vote-btn">@trans('vote')</button>
-                            <div class="vote-result" style="display:none"></div>
-                        </form>
-                    @endif
-                </div>
-            @endforeach
+                        </div>
+                    @endforeach
+                @else
+                    @for ($i = 0; $i < 3; $i++)
+                        <div class="event-card">
+                            <div class="h-60 flex items-center justify-center"
+                                style="background: linear-gradient(135deg, var(--dark-surface), var(--dark-bg));">
+                                <svg class="w-16 h-16 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
+                                    <path
+                                        d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" />
+                                </svg>
+                            </div>
+                            <div class="p-6">
+                                <h3 class="display-font text-xl font-bold text-white mb-3">Событие скоро появится</h3>
+                                <p class="text-gray-500 text-sm">Следите за обновлениями нашей афиши</p>
+                            </div>
+                        </div>
+                    @endfor
+                @endif
+            </div>
+
+            <div class="text-center mt-12">
+                <a href="{{ route('frontend.afisha') }}" class="btn-primary text-lg">
+                    @trans('view_all_events')
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== Видео секция ===== -->
+    <section class="py-20 px-6 section-dark">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-14">
+                <p class="text-sm uppercase tracking-widest mb-3" style="color: var(--gold);">Медиа</p>
+                <h2 class="section-title">@trans('main_video') </h2>
+                <div class="gold-divider"></div>
+                <p class="section-subtitle">@trans('Immerse_yourself_title')</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                @if (isset($videos) && $videos->count())
+                    @foreach ($videos->take(4) as $video)
+                        <div class="rounded-2xl overflow-hidden h-72 relative group cursor-pointer border transition-all duration-300 hover:border-opacity-100"
+                            style="background: var(--dark-card); border-color: var(--dark-border);"
+                            onclick="openVideoModal('{{ $video->video_url }}')">
+                            @if ($video->video_image)
+                                <img src="{{ asset($video->video_image) }}" alt="{{ $video->title_ru }}"
+                                    class="w-full h-full object-cover opacity-60 group-hover:opacity-40 transition-all duration-500 group-hover:scale-105">
+                            @endif
+                            <div class="absolute inset-0 flex flex-col items-center justify-center z-10">
+                                <div class="w-16 h-16 rounded-full flex items-center justify-center transition-all duration-300 group-hover:scale-110"
+                                    style="background: var(--gold);">
+                                    <svg class="w-7 h-7 ml-1" style="color: var(--dark-bg);" fill="currentColor"
+                                        viewBox="0 0 20 20">
+                                        <path
+                                            d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                                    </svg>
+                                </div>
+                                <p class="text-white text-lg font-semibold mt-4 px-6 text-center">{{ $video->title_ru }}
+                                </p>
+                            </div>
+                        </div>
+                    @endforeach
+                @else
+                    @for ($i = 0; $i < 2; $i++)
+                        <div class="rounded-2xl overflow-hidden h-72 relative flex items-center justify-center border"
+                            style="background: var(--dark-card); border-color: var(--dark-border);">
+                            <div class="w-16 h-16 rounded-full flex items-center justify-center"
+                                style="background: rgba(201,168,76,0.2);">
+                                <svg class="w-7 h-7 ml-1" style="color: var(--gold);" fill="currentColor"
+                                    viewBox="0 0 20 20">
+                                    <path
+                                        d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                                </svg>
+                            </div>
+                        </div>
+                    @endfor
+                @endif
+            </div>
+        </div>
+    </section>
+
+    {{-- Видео модальное окно --}}
+    <div class="video-overlay" id="videoOverlay" onclick="closeVideoModal(event)">
+        <div class="relative w-full max-w-4xl mx-4">
+            <button onclick="closeVideoModal()"
+                class="absolute -top-12 right-0 text-white text-3xl hover:text-gold transition">&times;</button>
+            <div class="aspect-video bg-black rounded-xl overflow-hidden">
+                <iframe id="videoIframe" class="w-full h-full" src="" frameborder="0"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowfullscreen></iframe>
+            </div>
         </div>
     </div>
-</section>
 
-<!-- Форма обратной связи -->
-<section class="contact-section">
-    <div class="container">
-        <h2 class="contact-title text-center">@trans('citizen_requests') </h2>
+    <!-- ===== О театре / О нас — объединённый блок ===== -->
+    @php
+        $aboutLocale = session('lang') == 'ru' ? 'ru' : (session('lang') == 'en' ? 'en' : 'tj');
+        $aboutTitle =
+            isset($about) && $about
+                ? $about->{'title_' . $aboutLocale} ?? ($about->title_ru ?? 'О театре')
+                : 'О театре';
+        $aboutHistories = isset($about) && $about ? $about->histories ?? [] : [];
+        $aboutBlocks = isset($about) && $about ? $about->blocks ?? [] : [];
+        $aboutStats = isset($about) && $about ? $about->stats ?? [] : [];
+        $aboutBlockKeys = \App\Models\About::blockKeys();
+        $aboutCardBlockKeys = [
+            'architectural_features',
+            'architecture_structure',
+            'cultural_heritage',
+            'technical_equipment',
+            'reconstruction',
+        ];
+        $aboutByLocale = function ($item, $key) use ($aboutLocale) {
+            return $item[$key . '_' . $aboutLocale] ?? ($item[$key . '_ru'] ?? '');
+        };
+        $firstTextBlockKey = 'construction_history';
+        $firstBlock = $aboutBlocks[$firstTextBlockKey] ?? [];
+        $firstBlockText = $firstBlock['text_' . $aboutLocale] ?? ($firstBlock['text_ru'] ?? '');
+    @endphp
+    <section class="py-20 px-6 section-surface">
+        <div class="max-w-6xl mx-auto">
+            <div class="grid lg:grid-cols-2 gap-16 items-start">
+                <div>
+                    <p class="text-sm uppercase tracking-widest mb-3" style="color: var(--gold);">@trans('about_our_history')</p>
+                    <h2 class="section-title" style="text-align: left;">{{ $aboutTitle }}</h2>
+                    <div class="gold-divider" style="margin-left: 0;"></div>
+                    @if ($firstBlockText)
+                        <div class="prose prose-invert max-w-none text-gray-400 whitespace-pre-line mt-6">
+                            {{ $firstBlockText }}</div>
+                    @endif
+                </div>
 
-        <div class="row">
-            <div class="col-md-12 mx-auto">
-                <form action="{{ route('contact_form_submit') }}" method="POST" class="contact-form">
+                <div class="relative">
+                    <div class="rounded-2xl overflow-hidden border sticky top-24"
+                        style="border-color: var(--dark-border);">
+                        @if (isset($about) && $about && $about->image)
+                            <img src="{{ asset($about->image) }}" alt="{{ $aboutTitle }}"
+                                class="w-full h-96 object-cover">
+                        @else
+                            <div class="w-full h-96"
+                                style="background: linear-gradient(135deg, var(--dark-card), var(--dark-bg));">
+                                <div class="w-full h-full flex items-center justify-center">
+                                    <svg class="w-24 h-24 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
+                                        <path
+                                            d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" />
+                                    </svg>
+                                </div>
+                            </div>
+                        @endif
+                    </div>
+                    <div class="absolute -bottom-4 -right-4 w-full h-full rounded-2xl border-2 -z-10"
+                        style="border-color: var(--gold); opacity: 0.3;"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    @foreach ($aboutBlockKeys as $key => $defaultTitle)
+        @if (in_array($key, $aboutCardBlockKeys) || $key === $firstTextBlockKey)
+            @continue
+        @endif
+        @php
+            $b = $aboutBlocks[$key] ?? [];
+            $blockTitle = $b['title_' . $aboutLocale] ?? ($b['title_ru'] ?? $defaultTitle);
+            $blockText = $b['text_' . $aboutLocale] ?? ($b['text_ru'] ?? '');
+        @endphp
+        @if ($blockTitle || $blockText)
+            <section class="py-20 px-6 section-dark">
+                <div class="max-w-6xl mx-auto">
+                    <h2 class="section-title mb-6">{{ $blockTitle }}</h2>
+                    <div class="gold-divider mb-8"></div>
+                    @if ($blockText)
+                        <div class="prose prose-invert max-w-none text-gray-400 whitespace-pre-line">{{ $blockText }}
+                        </div>
+                    @else
+                        <p class="text-gray-500">@trans('about_block_fill_admin') <a href="{{ route('admin.about.index') }}"
+                                class="text-gold hover:underline">@trans('about_admin_link')</a>@trans('about_in_admin_panel')</p>
+                    @endif
+                </div>
+            </section>
+        @endif
+    @endforeach
+
+    @if (count($aboutStats) > 0)
+        <section class="py-20 px-6 section-surface"
+            style="border-top: 1px solid var(--dark-border); border-bottom: 1px solid var(--dark-border);">
+            <div class="max-w-7xl mx-auto">
+                <div class="grid md:grid-cols-4 gap-8 text-center">
+                    @foreach ($aboutStats as $stat)
+                        @if (empty($stat['num']) && empty($stat['label_ru']) && empty($stat['label_tj']) && empty($stat['label_en']))
+                            @continue
+                        @endif
+                        <div>
+                            <div class="display-font text-5xl font-bold mb-3" style="color: var(--gold);">
+                                {{ $stat['num'] ?? '' }}</div>
+                            <p class="text-gray-400">{{ $aboutByLocale($stat, 'label') }}</p>
+                        </div>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+
+    <!-- ===== Полезные ссылки ===== -->
+    @if ($links && $links->count())
+        <section class="py-16 px-6 section-surface">
+            <div class="max-w-6xl mx-auto">
+
+
+                <div class="partner-links-grid">
+                    @foreach ($links as $link)
+                        <a href="{{ $link->url ?: '#' }}" target="{{ $link->url ? '_blank' : '_self' }}"
+                            rel="noopener noreferrer" class="partner-link-card">
+
+                            @if ($link->img)
+                                <img src="{{ asset($link->img) }}" alt="{{ $link->title_ru ?? $link->title_tj }}"
+                                    class="partner-link-logo">
+                            @else
+                                <div class="partner-link-logo-placeholder">
+                                    <svg width="36" height="36" fill="none" stroke="currentColor"
+                                        stroke-width="1.5" viewBox="0 0 24 24" style="color: var(--gold); opacity: 0.6;">
+                                        <path stroke-linecap="round" stroke-linejoin="round"
+                                            d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                                    </svg>
+                                </div>
+                            @endif
+
+                            <span class="partner-link-name">
+                                @if (session()->get('lang') == 'ru')
+                                    {{ $link->title_ru ?? $link->title_tj }}
+                                @elseif(session()->get('lang') == 'en')
+                                    {{ $link->title_en ?? $link->title_tj }}
+                                @else
+                                    {{ $link->title_tj }}
+                                @endif
+                            </span>
+                        </a>
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+
+    <!-- ===== Обратная связь ===== -->
+    <section class="py-20 px-6 section-dark" id="contact-form">
+        <div class="max-w-3xl mx-auto">
+            <div class="text-center mb-12">
+                <p class="text-sm uppercase tracking-widest mb-3" style="color: var(--gold);">@trans('citizen_requests')</p>
+
+                <div class="gold-divider"></div>
+                <p class="section-subtitle">
+                    @trans('write_to _us')
+                </p>
+            </div>
+
+            <div class="contact-form-wrapper">
+                <form id="contactForm" action="{{ route('contact_form_submit') }}" method="POST">
                     @csrf
-                    <div class="row">
-                        <div class="col-md-6">
-                            <input type="text" name="name" class="contact-input" placeholder="Ф.И.О" required>
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-2">your_name_title</label>
+                            <input type="text" name="name" required class="form-input" placeholder="Введите имя">
                         </div>
-                        <div class="col-md-6">
-                            <input type="tel" name="phone" class="contact-input" placeholder="Телефон" required>
-                        </div>
-                        <div class="col-md-12">
-                            <input type="email" name="email" class="contact-input" placeholder="Email" required>
-                        </div>
-                        <div class="col-md-12">
-                            <textarea name="message" class="contact-textarea" placeholder="Тема" required></textarea>
-                        </div>
-                       <div class="col-md-2 d-flex justify-content-center">
-                            <button type="submit" class="vote-btn">@trans('send_button')</button>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-2">Email</label>
+                            <input type="email" name="email" required class="form-input"
+                                placeholder="your@email.com">
                         </div>
                     </div>
+
+                    <div class="grid md:grid-cols-2 gap-6 mb-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-2">@trans('phone_title')</label>
+                            <input type="tel" name="phone" class="form-input" placeholder="+992 XX XXX XXXX">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-400 mb-2">@trans('subject_title')</label>
+                            <select name="subject" class="form-input">
+                                <option value="tickets">@trans('tickets_title_purchasing')</option>
+                                <option value="cooperation">@trans('cooperation_title')</option>
+                                <option value="rent">@trans('rent_title')</option>
+                                <option value="general">@trans('general_questions_title')</option>
+                                <option value="other">@trans('other_title')</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mb-6">
+                        <label class="block text-sm font-medium text-gray-400 mb-2">@trans('message_title')</label>
+                        <textarea name="message" required class="form-input" rows="5"
+                            placeholder="Опишите ваш вопрос или предложение..."></textarea>
+                    </div>
+
+                    <button type="submit" class="btn-primary w-full py-4 text-lg font-semibold">
+                        @trans('send_button')
+                    </button>
                 </form>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
 
 
 
-<section class="py-5 bg-white">
-    <div class="container">
-        <h3 class="fw-bold mb-4 text-uppercase">  @trans('our_partners')  </h3>
-
-        <div class="row justify-content-between text-center text-md-start">
-            @foreach($partners as $item)
-            <div class="col-12 col-md-3 mb-4 d-flex align-items-center gap-3">
-                <a href="{{ $item->url }}" target="_blank"><img src="{{ $item->img }}" alt="logo"  style="width: 50px;"></a>
-                <span class="fw-semibold">
-                    @if (session('lang') == 'ru')
-                       {{ $item->title_ru }}
-                    @elseif(session('lang') == 'en')
-                         {{ $item->title_en }}
-                    @else
-                        {{ $item->title_tj }}
-                    @endif
-                </span>
-            </div>
-            @endforeach
-        
-        </div>
-
-    </div>
-</section>
 
 
 @endsection
+
+@push('scripts')
+    <script>
+        // ===== Слайдер Hero =====
+        document.addEventListener('DOMContentLoaded', function() {
+            const slider = document.getElementById('heroSlider');
+            if (!slider) return;
+
+            const slides = slider.querySelectorAll('.hero-slide');
+            const dots = document.querySelectorAll('.slider-dot');
+            const prevBtn = document.getElementById('sliderPrev');
+            const nextBtn = document.getElementById('sliderNext');
+
+            if (slides.length <= 1) return;
+
+            let currentSlide = 0;
+            let interval;
+
+            function goToSlide(index) {
+                slides[currentSlide].classList.remove('active');
+                if (dots[currentSlide]) dots[currentSlide].classList.remove('active');
+
+                currentSlide = ((index % slides.length) + slides.length) % slides.length;
+
+                slides[currentSlide].classList.add('active');
+                if (dots[currentSlide]) dots[currentSlide].classList.add('active');
+            }
+
+            function nextSlide() {
+                goToSlide(currentSlide + 1);
+            }
+
+            function prevSlide() {
+                goToSlide(currentSlide - 1);
+            }
+
+            // Стрелки
+            if (prevBtn) prevBtn.addEventListener('click', () => {
+                clearInterval(interval);
+                prevSlide();
+                interval = setInterval(nextSlide, 5000);
+            });
+            if (nextBtn) nextBtn.addEventListener('click', () => {
+                clearInterval(interval);
+                nextSlide();
+                interval = setInterval(nextSlide, 5000);
+            });
+
+            // Точки
+            dots.forEach(dot => {
+                dot.addEventListener('click', () => {
+                    clearInterval(interval);
+                    goToSlide(parseInt(dot.dataset.index));
+                    interval = setInterval(nextSlide, 5000);
+                });
+            });
+
+            interval = setInterval(nextSlide, 5000);
+        });
+
+        // ===== Видео модальное окно =====
+        function openVideoModal(url) {
+            const overlay = document.getElementById('videoOverlay');
+            const iframe = document.getElementById('videoIframe');
+
+            let embedUrl = url;
+            if (url.includes('youtube.com/watch')) {
+                const videoId = new URL(url).searchParams.get('v');
+                embedUrl = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1';
+            } else if (url.includes('youtu.be/')) {
+                const videoId = url.split('youtu.be/')[1].split('?')[0];
+                embedUrl = 'https://www.youtube.com/embed/' + videoId + '?autoplay=1';
+            }
+
+            iframe.src = embedUrl;
+            overlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeVideoModal(event) {
+            if (event && event.target !== event.currentTarget && !event.target.closest('button')) return;
+            const overlay = document.getElementById('videoOverlay');
+            const iframe = document.getElementById('videoIframe');
+            iframe.src = '';
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeVideoModal();
+        });
+    </script>
+@endpush

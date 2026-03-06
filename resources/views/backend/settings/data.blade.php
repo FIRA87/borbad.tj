@@ -166,6 +166,35 @@
                                         </div>
                                     </div>
 
+                                    <!-- Режим работы (для страницы контактов) -->
+                                    <div class="col-lg-4">
+                                        <div class="form-group mb-3">
+                                            <label for="working_hours_weekdays" class="form-label">Режим работы Пн–Пт</label>
+                                            <input type="text" id="working_hours_weekdays" class="form-control"
+                                                   name="working_hours_weekdays"
+                                                   value="{{ old('working_hours_weekdays', $settings->working_hours_weekdays ?? '') }}"
+                                                   placeholder="10:00 — 20:00">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group mb-3">
+                                            <label for="working_hours_weekend" class="form-label">Режим работы Сб–Вс</label>
+                                            <input type="text" id="working_hours_weekend" class="form-control"
+                                                   name="working_hours_weekend"
+                                                   value="{{ old('working_hours_weekend', $settings->working_hours_weekend ?? '') }}"
+                                                   placeholder="12:00 — 21:00">
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4">
+                                        <div class="form-group mb-3">
+                                            <label for="working_hours_box" class="form-label">Касса (подпись)</label>
+                                            <input type="text" id="working_hours_box" class="form-control"
+                                                   name="working_hours_box"
+                                                   value="{{ old('working_hours_box', $settings->working_hours_box ?? '') }}"
+                                                   placeholder="За 2 часа до начала мероприятия">
+                                        </div>
+                                    </div>
+
                                     <!-- Карта -->
                                     <div class="col-lg-12">
                                         <div class="form-group mb-3">

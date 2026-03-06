@@ -9,15 +9,14 @@ use App\Models\News;
 use App\Models\Page;
 use App\Models\Link;
 use App\Models\Subcategory;
-use App\Models\Testimonial;
 use App\Models\User;
 use App\Models\Video;
 use App\Models\Survey;
-use App\Models\SeoSetting;
 use App\Models\President;
-use App\Models\Project;
 use App\Models\Leader;
 use App\Models\Document;
+use App\Models\Setting;
+use App\Models\About;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -32,40 +31,39 @@ class IndexController extends Controller
 
 	public function allNews()
 	{
-	    $news = News::where('status', 1)->orderBy('publish_date', 'DESC')->paginate(4);    
+	    $news = News::where('status', 1)->where('category_id', 1)->orderBy('publish_date', 'DESC')->paginate(9);
 	    return view('frontend.pages.all_news', compact('news'));
 	}
 
 	public function newsDetails($id)
 	{
 	    // Находим новость с дополнительными изображениями
-	    $news = News::with('images')->findOrFail($id);	    
-	    // Популярные новости (по количеству просмотров)
-	    $popularNews = News::where('status', 1)->orderBy('views', 'DESC')->limit(5)->get();	    
+	    $news = News::with('images')->findOrFail($id);
+
 	    // Получаем категорию
 	    $cat_id = $news->category_id;
-	    
+
 	    // Последние новости
 	    $latestNews = News::where('status', 1)->orderBy('publish_date', 'DESC')->limit(5)->get();
-	    
+
 	    // Похожие новости (из той же категории)
 	    $related_news = News::where('status', 1)->where('category_id', $cat_id)->where('id', '!=', $id)->orderBy('publish_date', 'DESC')->limit(6)->get();
-	    
+
 	    // Счетчик просмотров (увеличиваем только один раз за сессию)
 	    $newsKey = 'news_' . $news->id;
 	    if (!Session::has($newsKey)) {
 	        $news->increment('views');
 	        Session::put($newsKey, 1);
 	    }
-	    
+
 	    // Хлебные крошки (категория новости)
-	    $breadcat = $news->category;	    
+	    $breadcat = $news->category;
 	    return view('frontend.pages.news_detail', compact(
-	        'news', 
-	        'related_news', 
-	        'breadcat', 
-	        'latestNews', 
-	        'popularNews'
+	        'news',
+	        'related_news',
+	        'breadcat',
+	        'latestNews',
+
 	    ));
 	}
 
@@ -82,22 +80,9 @@ class IndexController extends Controller
 
 
 
-	public function allProjects()
-	{
-		$allProjects = Project::where('status', 1)->orderBy('created_at', 'ASC')->paginate(9);
-		return view('frontend.pages.all_projects', compact('allProjects'));
-	}
-
-	public function projectDetail($id)
-	{
-	    $project = Project::findOrFail($id);  
-	    $project->increment('views');	    
-	    return view('frontend.pages.project_detail', compact('project'));
-	}
-
 	public function allLeader()
 	{
-	    $allLeaders = Leader::where('status', 1)->orderBy('created_at', 'ASC')->paginate(10);    
+	    $allLeaders = Leader::where('status', 1)->orderBy('created_at', 'ASC')->paginate(10);
 	    return view('frontend.pages.all_leaders', compact('allLeaders'));
 	}
 
@@ -114,14 +99,114 @@ class IndexController extends Controller
 	    return view('frontend.pages.prezident_detail', compact('prizent'));
 	}
 
+	/**
+	 * Страница "О нас" — контент из БД (About), команда из Leaders.
+	 */
+	public function aboutPage()
+	{
+		$about = About::getContent();
+		$leaders = Leader::where('status', 1)->limit(3)->get();
+		return view('frontend.pages.about_page', compact('about', 'leaders'));
+	}
 
+	/**
+	 * Страница "Афиша" — список событий с пагинацией
+	 */
+	public function afishaPage()
+	{
+		$news = News::where('status', 1)->where('category_id', 3)
+			->orderByDesc('publish_date')
+			->paginate(10);
 
-	
+		return view('frontend.pages.afisha_page', compact('news'));
+	}
 
+	/**
+	 * Детальная страница события афиши (новость категории «Афиша»).
+	 */
+	public function afishaDetail($id)
+	{
+		$news = News::with('images')->where('category_id', 3)->where('status', 1)->findOrFail($id);
+
+		$newsKey = 'news_' . $news->id;
+		if (!Session::has($newsKey)) {
+			$news->increment('views');
+			Session::put($newsKey, 1);
+		}
+
+		$related_news = News::where('status', 1)->where('category_id', 3)
+			->where('id', '!=', $id)
+			->orderByDesc('publish_date')
+			->limit(6)
+			->get();
+
+		return view('frontend.pages.afisha_page_detail', compact('news', 'related_news'));
+	}
+
+	// ID категории "События" — поменяй при необходимости
+	private const EVENTS_CATEGORY_ID = 4;
+
+	/**
+	 * Страница "События" — список
+	 */
+	public function eventsPage()
+	{
+		$news = News::where('status', 1)->where('category_id', self::EVENTS_CATEGORY_ID)
+			->orderByDesc('publish_date')
+			->paginate(12);
+
+		return view('frontend.pages.events_page', compact('news'));
+	}
+
+	/**
+	 * Детальная страница события.
+	 */
+	public function eventsDetail($id)
+	{
+		$news = News::with('images')->where('category_id', self::EVENTS_CATEGORY_ID)->where('status', 1)->findOrFail($id);
+
+		$newsKey = 'news_' . $news->id;
+		if (!Session::has($newsKey)) {
+			$news->increment('views');
+			Session::put($newsKey, 1);
+		}
+
+		$related_news = News::where('status', 1)->where('category_id', self::EVENTS_CATEGORY_ID)
+			->where('id', '!=', $id)
+			->orderByDesc('publish_date')
+			->limit(6)
+			->get();
+
+		return view('frontend.pages.events_page_detail', compact('news', 'related_news'));
+	}
+
+	/**
+	 * Страница "Галерея"
+	 */
+	public function galleryPage()
+	{
+		$galleries = Gallery::orderByDesc('id')->paginate(12);
+		$videos = Video::where('status', 1)->orderByDesc('id')->limit(4)->get();
+		return view('frontend.pages.gallery_page', compact('galleries', 'videos'));
+	}
+
+	/**
+	 * Страница "Контакты" — только блоки: адрес, телефон, email, режим работы.
+	 * Форма "Напишите нам" и блок "Как нас найти" не выводятся (есть на других страницах).
+	 */
+	public function contactsPage()
+	{
+		$settings = Setting::first();
+		return view('frontend.pages.contacts_page', compact('settings'));
+	}
+
+	/**
+	 * Главная страница
+	 */
 	public function index()
 	{
 		$now = now();
-    
+
 		// Вспомогательная функция для безопасного выполнения запросов
 		$safeQuery = function ($callback, $default = null) {
 			try {
@@ -137,10 +222,10 @@ class IndexController extends Controller
 
 
 		$data = [
-			'news' => $safeQuery(fn() =>News::with('images')->published()->orderByDesc('publish_date')->get()),
-			'sliders' => $safeQuery(fn() =>News::published()->where('top_slider', 1)->orderByDesc('publish_date')->limit(3)->get()),
+			'news' => $safeQuery(fn() =>News::with('images')->published()->where('category_id',  3 )->orderByDesc('publish_date')->get()),
+			'sliders' => $safeQuery(fn() =>News::published()->where('top_slider', 1)->orderByDesc('publish_date')->limit(5)->get()),
 			'home_page' => $safeQuery(fn() =>News::with('images')->published()->where('home_page', 1)->limit(1)->get()),
-			'home_page2' => $safeQuery(fn() => 
+			'home_page2' => $safeQuery(fn() =>
 				News::with([
 					'tasks' => fn($query) => $query
 						->where('status', 1)
@@ -156,16 +241,15 @@ class IndexController extends Controller
 
 			'galleries' => $safeQuery(fn() => Gallery::limit(3)->get()),
 			'videos' => $safeQuery(fn() =>Video::where('status', 1)->orderByDesc('id')->limit(4)->get()),
-			'links' => $safeQuery(fn() =>Link::where('status', 1)->where('type', 1)->limit(3)->get()),
+			'links' => $safeQuery(fn() =>Link::where('status', 1)->orderBy('sort')->limit(4)->get()),
 			'prezident' => $safeQuery(fn() =>President::where('status', 1)->limit(1)->get()),
-			'projects' => $safeQuery(fn() =>Project::where('status', 1)->limit(3)->get()),
 			'leaders' => $safeQuery(fn() =>Leader::where('status', 1)->limit(4)->get()),
-			'partners' => $safeQuery(fn() =>Link::where('status', 1)->limit(3)->get()),
-			'survey' => $safeQuery(fn() => Survey::with('questions.options')->where('is_active', 1)->latest()->first()	),
+			'partners' => $safeQuery(fn() =>Link::where('status', 1)->orderBy('sort')->limit(4)->get()),
+			'about' => $safeQuery(fn() => About::getContent()),
 		];
 
     return view('frontend.index', $data);
-}
+    }
 
 
 
@@ -219,7 +303,8 @@ class IndexController extends Controller
 	} // END METHOD
 
 
-	   public function allVideos(){
+    public function allVideos()
+    {
         $pages = Page::all();
         $videos = Video::orderBy('id', 'DESC')->paginate(8);
         return view('frontend.pages.all_video', compact('videos', 'pages'));
@@ -229,7 +314,7 @@ class IndexController extends Controller
 
 	public function documents(Request $request)
 	{
-	    $query = Document::query()->where('is_active', 1);	    
+	    $query = Document::query()->where('is_active', 1);
 	    if ($request->filled('q')) {
 	        $q = $request->q;
 	        $query->where(function ($sub) use ($q) {
@@ -265,13 +350,28 @@ class IndexController extends Controller
 	{
 	    $doc = Document::findOrFail($id);
 
-	    return response()->download(public_path($doc->file_path));
+	    if (!$doc->is_active) {
+	        abort(404);
+	    }
+
+	    $filePath = $doc->file_path;
+	    if (empty($filePath) || str_contains($filePath, '..')) {
+	        abort(404);
+	    }
+
+	    $absolutePath = public_path($filePath);
+	    $realPath = realpath($absolutePath);
+	    if ($realPath === false || !str_starts_with($realPath, realpath(public_path()))) {
+	        abort(404);
+	    }
+
+	    return response()->download($realPath);
 	}
 
 
 	public function filterNews(Request $request)
 	{
-	    $query = News::where('status', 1);
+	    $query = News::where('status', 1)->where('category_id', 1);
 
 	    // Поиск по заголовкам и тексту
 	    if ($request->filled('search')) {

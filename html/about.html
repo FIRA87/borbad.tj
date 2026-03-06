@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>О нас - Борбад</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --burgundy-deep: #5C0A0A;
+            --burgundy-main: #8B1538;
+            --burgundy-light: #B8264D;
+            --gold: #D4AF37;
+            --gold-light: #F4E5B8;
+            --cream: #FFF8F0;
+            --charcoal: #1A1A1A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cormorant Garamond', serif;
+            background: var(--cream);
+            color: var(--charcoal);
+        }
+
+        .display-font {
+            font-family: 'Playfair Display', serif;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--burgundy-main), var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-link {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--gold);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+
+        .nav-link:hover::after {
+            transform: translateX(0);
+        }
+
+        .decorative-line {
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--burgundy-main), var(--gold));
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.6s ease-out forwards;
+            opacity: 0;
+        }
+
+        .delay-100 { animation-delay: 0.1s; }
+        .delay-200 { animation-delay: 0.2s; }
+        .delay-300 { animation-delay: 0.3s; }
+
+        .stat-card {
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-10px);
+        }
+
+        .texture-overlay {
+            position: relative;
+        }
+
+        .texture-overlay::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' /%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23noise)' opacity='0.05'/%3E%3C/svg%3E");
+            pointer-events: none;
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--burgundy-main), var(--gold));
+            transform: translateX(-50%);
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md shadow-lg">
+        <div class="max-w-7xl mx-auto px-6 py-4">
+            <div class="flex items-center justify-between">
+                <div class="display-font text-3xl font-bold gradient-text">
+                    Борбад
+                </div>
+                
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="index.html" class="nav-link text-lg font-medium text-gray-800 hover:text-burgundy-main pb-1">Главная</a>
+                    <a href="afisha.html" class="nav-link text-lg font-medium text-gray-800 hover:text-burgundy-main pb-1">Афиша</a>
+                    <a href="about.html" class="nav-link text-lg font-medium text-gray-800 hover:text-burgundy-main pb-1">О нас</a>
+                    <a href="gallery.html" class="nav-link text-lg font-medium text-gray-800 hover:text-burgundy-main pb-1">Галерея</a>
+                    <a href="contacts.html" class="nav-link text-lg font-medium text-gray-800 hover:text-burgundy-main pb-1">Контакты</a>
+                </div>
+
+                <button class="md:hidden text-gray-800" id="mobileMenuBtn">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <div class="hidden md:hidden mt-4 pb-4" id="mobileMenu">
+                <a href="index.html" class="block py-2 text-lg font-medium text-gray-800 hover:text-burgundy-main">Главная</a>
+                <a href="afisha.html" class="block py-2 text-lg font-medium text-gray-800 hover:text-burgundy-main">Афиша</a>
+                <a href="about.html" class="block py-2 text-lg font-medium text-gray-800 hover:text-burgundy-main">О нас</a>
+                <a href="gallery.html" class="block py-2 text-lg font-medium text-gray-800 hover:text-burgundy-main">Галерея</a>
+                <a href="contacts.html" class="block py-2 text-lg font-medium text-gray-800 hover:text-burgundy-main">Контакты</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header -->
+    <section class="pt-32 pb-16 px-6 texture-overlay" style="background: linear-gradient(135deg, #FFF8F0 0%, #F4E5B8 100%);">
+        <div class="max-w-7xl mx-auto text-center">
+            <h1 class="display-font text-6xl md:text-7xl font-black mb-6 fade-in-up" style="color: var(--burgundy-deep);">
+                О театре
+            </h1>
+            <div class="decorative-line mx-auto delay-100 fade-in-up"></div>
+            <p class="text-2xl text-gray-700 mt-6 max-w-3xl mx-auto fade-in-up delay-200">
+                История, миссия и ценности театрально-концертного зала Борбад
+            </p>
+        </div>
+    </section>
+
+    <!-- Mission Section -->
+    <section class="py-20 px-6 bg-white">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="display-font text-5xl font-bold mb-6" style="color: var(--burgundy-deep);">
+                    Наша миссия
+                </h2>
+                <div class="decorative-line mx-auto"></div>
+            </div>
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center p-8 rounded-2xl shadow-lg stat-card" style="background: linear-gradient(135deg, #FFF8F0, white);">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--burgundy-main), var(--burgundy-deep));">
+                        <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                        </svg>
+                    </div>
+                    <h3 class="display-font text-2xl font-bold mb-4" style="color: var(--burgundy-deep);">
+                        Культурное просвещение
+                    </h3>
+                    <p class="text-lg text-gray-700">
+                        Делаем искусство доступным для всех слоёв населения
+                    </p>
+                </div>
+
+                <div class="text-center p-8 rounded-2xl shadow-lg stat-card" style="background: linear-gradient(135deg, #FFF8F0, white);">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, var(--burgundy-light), var(--burgundy-main));">
+                        <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/>
+                            <path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm9.707 5.707a1 1 0 00-1.414-1.414L9 12.586l-1.293-1.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                        </svg>
+                    </div>
+                    <h3 class="display-font text-2xl font-bold mb-4" style="color: var(--burgundy-deep);">
+                        Поддержка искусства
+                    </h3>
+                    <p class="text-lg text-gray-700">
+                        Создаём платформу для талантливых артистов
+                    </p>
+                </div>
+
+                <div class="text-center p-8 rounded-2xl shadow-lg stat-card" style="background: linear-gradient(135deg, #FFF8F0, white);">
+                    <div class="w-20 h-20 mx-auto mb-6 rounded-full flex items-center justify-center" style="background: linear-gradient(135deg, #D4AF37, #8B1538);">
+                        <svg class="w-10 h-10 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zM14.553 7.106A1 1 0 0014 8v4a1 1 0 00.553.894l2 1A1 1 0 0018 13V7a1 1 0 00-1.447-.894l-2 1z"/>
+                        </svg>
+                    </div>
+                    <h3 class="display-font text-2xl font-bold mb-4" style="color: var(--burgundy-deep);">
+                        Культурный обмен
+                    </h3>
+                    <p class="text-lg text-gray-700">
+                        Объединяем традиции и современность
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- History Section -->
+    <section class="py-20 px-6" style="background: linear-gradient(135deg, #FFF8F0 0%, white 100%);">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="display-font text-5xl font-bold mb-6" style="color: var(--burgundy-deep);">
+                    История развития
+                </h2>
+                <div class="decorative-line mx-auto"></div>
+            </div>
+
+            <div class="relative">
+                <div class="timeline-item relative">
+                    <div class="grid md:grid-cols-2 gap-12 mb-16">
+                        <div class="text-right">
+                            <div class="inline-block bg-white p-8 rounded-2xl shadow-xl">
+                                <div class="display-font text-4xl font-bold mb-4" style="color: var(--gold);">
+                                    1985
+                                </div>
+                                <h3 class="display-font text-2xl font-bold mb-4" style="color: var(--burgundy-deep);">
+                                    Основание
+                                </h3>
+                                <p class="text-lg text-gray-700">
+                                    Открытие театрально-концертного зала в центре Душанбе как культурного центра столицы
+                                </p>
+                            </div>
+                        </div>
+                        <div></div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-12 mb-16">
+                        <div></div>
+                        <div>
+                            <div class="inline-block bg-white p-8 rounded-2xl shadow-xl">
+                                <div class="display-font text-4xl font-bold mb-4" style="color: var(--gold);">
+                                    1998
+                                </div>
+                                <h3 class="display-font text-2xl font-bold mb-4" style="color: var(--burgundy-deep);">
+                                    Реконструкция
+                                </h3>
+                                <p class="text-lg text-gray-700">
+                                    Масштабная модернизация зала с установкой современного оборудования
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-12 mb-16">
+                        <div class="text-right">
+                            <div class="inline-block bg-white p-8 rounded-2xl shadow-xl">
+                                <div class="display-font text-4xl font-bold mb-4" style="color: var(--gold);">
+                                    2010
+                                </div>
+                                <h3 class="display-font text-2xl font-bold mb-4" style="color: var(--burgundy-deep);">
+                                    Расширение
+                                </h3>
+                                <p class="text-lg text-gray-700">
+                                    Добавление камерного зала и пространства для выставок
+                                </p>
+                            </div>
+                        </div>
+                        <div></div>
+                    </div>
+
+                    <div class="grid md:grid-cols-2 gap-12">
+                        <div></div>
+                        <div>
+                            <div class="inline-block bg-white p-8 rounded-2xl shadow-xl">
+                                <div class="display-font text-4xl font-bold mb-4" style="color: var(--gold);">
+                                    2026
+                                </div>
+                                <h3 class="display-font text-2xl font-bold mb-4" style="color: var(--burgundy-deep);">
+                                    Сегодня
+                                </h3>
+                                <p class="text-lg text-gray-700">
+                                    Ведущая культурная площадка с более чем 200 мероприятиями в год
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="py-20 px-6 texture-overlay" style="background: linear-gradient(135deg, var(--burgundy-deep), var(--burgundy-main));">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-4 gap-8 text-center">
+                <div>
+                    <div class="display-font text-6xl font-bold mb-4" style="color: var(--gold);">
+                        500+
+                    </div>
+                    <p class="text-xl text-white">
+                        Посадочных мест
+                    </p>
+                </div>
+                <div>
+                    <div class="display-font text-6xl font-bold mb-4" style="color: var(--gold);">
+                        200+
+                    </div>
+                    <p class="text-xl text-white">
+                        Мероприятий в год
+                    </p>
+                </div>
+                <div>
+                    <div class="display-font text-6xl font-bold mb-4" style="color: var(--gold);">
+                        40+
+                    </div>
+                    <p class="text-xl text-white">
+                        Лет истории
+                    </p>
+                </div>
+                <div>
+                    <div class="display-font text-6xl font-bold mb-4" style="color: var(--gold);">
+                        50K+
+                    </div>
+                    <p class="text-xl text-white">
+                        Посетителей в год
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team Section -->
+    <section class="py-20 px-6 bg-white">
+        <div class="max-w-6xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="display-font text-5xl font-bold mb-6" style="color: var(--burgundy-deep);">
+                    Наша команда
+                </h2>
+                <div class="decorative-line mx-auto"></div>
+                <p class="text-xl text-gray-600 mt-6">
+                    Профессионалы, создающие незабываемые впечатления
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center">
+                    <div class="w-48 h-48 mx-auto mb-6 rounded-full" style="background: linear-gradient(135deg, var(--burgundy-main), var(--burgundy-deep));"></div>
+                    <h3 class="display-font text-2xl font-bold mb-2" style="color: var(--burgundy-deep);">
+                        Имя Директора
+                    </h3>
+                    <p class="text-lg mb-4" style="color: var(--gold);">
+                        Директор театра
+                    </p>
+                    <p class="text-gray-600">
+                        Более 20 лет в сфере культуры и искусства
+                    </p>
+                </div>
+
+                <div class="text-center">
+                    <div class="w-48 h-48 mx-auto mb-6 rounded-full" style="background: linear-gradient(135deg, var(--burgundy-light), var(--burgundy-main));"></div>
+                    <h3 class="display-font text-2xl font-bold mb-2" style="color: var(--burgundy-deep);">
+                        Имя Художественного руководителя
+                    </h3>
+                    <p class="text-lg mb-4" style="color: var(--gold);">
+                        Художественный руководитель
+                    </p>
+                    <p class="text-gray-600">
+                        Лауреат национальных театральных премий
+                    </p>
+                </div>
+
+                <div class="text-center">
+                    <div class="w-48 h-48 mx-auto mb-6 rounded-full" style="background: linear-gradient(135deg, #D4AF37, #8B1538);"></div>
+                    <h3 class="display-font text-2xl font-bold mb-2" style="color: var(--burgundy-deep);">
+                        Имя Технического директора
+                    </h3>
+                    <p class="text-lg mb-4" style="color: var(--gold);">
+                        Технический директор
+                    </p>
+                    <p class="text-gray-600">
+                        Эксперт по театральному оборудованию
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="py-12 px-6 texture-overlay" style="background: linear-gradient(135deg, var(--burgundy-deep), var(--burgundy-main));">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="display-font text-2xl font-bold mb-4" style="color: var(--gold);">Борбад</h3>
+                    <p class="text-gray-300 text-lg">
+                        Театрально-концертный зал
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-lg" style="color: var(--gold-light);">Навигация</h4>
+                    <ul class="space-y-2">
+                        <li><a href="index.html" class="text-gray-300 hover:text-white transition">Главная</a></li>
+                        <li><a href="afisha.html" class="text-gray-300 hover:text-white transition">Афиша</a></li>
+                        <li><a href="about.html" class="text-gray-300 hover:text-white transition">О нас</a></li>
+                        <li><a href="gallery.html" class="text-gray-300 hover:text-white transition">Галерея</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-lg" style="color: var(--gold-light);">Контакты</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li>г. Душанбе, Таджикистан</li>
+                        <li>Тел: +992 XX XXX XXXX</li>
+                        <li>Email: info@borbad.tj</li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-semibold mb-4 text-lg" style="color: var(--gold-light);">Режим работы</h4>
+                    <ul class="space-y-2 text-gray-300">
+                        <li>Пн-Пт: 10:00 - 20:00</li>
+                        <li>Сб-Вс: 12:00 - 21:00</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t pt-6" style="border-color: rgba(212, 175, 55, 0.3);">
+                <p class="text-center text-gray-400">
+                    &copy; 2026 Борбад. Все права защищены.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+        const mobileMenu = document.getElementById('mobileMenu');
+        
+        mobileMenuBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('hidden');
+        });
+    </script>
+</body>
+</html>

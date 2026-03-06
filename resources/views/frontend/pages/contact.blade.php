@@ -2,229 +2,144 @@
 
 @section('title')
     @trans('contact')
-
 @endsection
 
 @php
     $siteSettings = App\Models\Setting::find(1);
-
 @endphp
+
+@push('styles')
+    <style>
+        .contact-card {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 16px;
+            padding: 32px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--gold);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .contact-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            background: var(--gold-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+    </style>
+@endpush
+
 @section('content')
-
-
-<!-- Banner Start -->
-<section class="banner">
-    <div class="container ">
-        <div class="row gy-4 gy-sm-0 align-items-center">
-            <div class="col-12 col-sm-6">
-                <div class="banner__content">
-                    <h1 class="banner__title display-4 wow fadeInLeft" data-wow-duration="0.8s"> @trans('contact') </h1> 
-                    <nav aria-label="breadcrumb">
-                        <ol class="breadcrumb wow fadeInRight" data-wow-duration="0.8s">
-                            <li class="breadcrumb-item">
-                                @if (session()->get('lang') == 'ru')
-                                    <a href="{{ url('/') }}" class="nav-item nav-link">Главная</a>
-                                @elseif(session()->get('lang') == 'en')
-                                    <a href="{{ url('/') }}" class="nav-item nav-link">Main</a>
-                                @else
-                                    <a href="{{ url('/') }}" class="nav-item nav-link">Асосӣ</a>
-                                @endif
-                            </li>
-                            <li class="breadcrumb-item active" aria-current="page"> @trans('contact')    </li>
-                        </ol>
-                    </nav>
-                </div>
-            </div>
-            <div class="col-12 col-sm-6">
-                <div class="banner__thumb text-end">
-                    <img src="frontend/assets/images/contact_banner.png" alt="image">
-                </div>
-            </div>
+    {{-- Заголовок --}}
+    <section class="pt-16 pb-12 px-6" style="background: var(--dark-surface); border-bottom: 1px solid var(--dark-border);">
+        <div class="max-w-7xl mx-auto text-center">
+            <p class="text-sm uppercase tracking-widest mb-3" style="color: var(--gold);">@trans('contact')</p>
+            <h1 class="display-font text-5xl md:text-6xl font-bold mb-4 text-white">@trans('contact')</h1>
+            <div class="gold-divider"></div>
         </div>
-    </div>
-</section>
-<!-- Banner End -->
-   
-<!-- contact start -->
-<section class="sign-up contact section">
-    <div class="container">
-        <div class="row gy-5 gy-xl-0 justify-content-center justify-content-lg-between">
-            <div class="col-12 col-lg-7 col-xxl-8">
-                 <form action="{{ route('contact_form_submit') }}" method="POST" class="form_subscribe_ajax sign-up__form wow fadeInDown">
-                        @csrf
-                       
-                        <h3 class="contact__title wow fadeInDown" data-wow-duration="0.8s">@trans('contact_us')     </h3>
+    </section>
 
-                        <div class="sign-up__form-part">
-                            <div class="input-group">
-                            <div class="input-single">
-                                 <label class="label" for="name">
-                                     @if(session()->get('lang') == 'ru')
-                                         Имя
-                                      @elseif(session()->get('lang') == 'en')
-                                         Name
-                                      @else
-                                         Ном
-                                      @endif
-                                 </label>
-                                <input type="text" class="form-control " placeholder="Your Name" name="name" required>
-                                <span class="text-danger error-text name_error"></span>
-                            </div>
-                            <div class="input-single">
-                                <label class="label" for="email">Email</label>
-                                <input type="email" class="form-control " placeholder="Your Email" name="email" required>
-                                <span class="text-danger error-text email_error"></span>
-                            </div>
-                            <div class="col-12">
-                                <label class="label" for="message">
-                                     @if(session()->get('lang') == 'ru')
-                                         Сообщение
-                                      @elseif(session()->get('lang') == 'en')
-                                         Message
-                                      @else
-                                         Ном
-                                      @endif
-                                </label>
-                                <textarea class="form-control" rows="4" placeholder="Message" name="message" required></textarea>
-                            </div>
-                            <div class="col-12">
-                                <button class="btn_theme btn_theme_active mt_40" type="submit">
-                                    @if(session()->get('lang') == 'ru')
-                                         Отправить
-                                      @elseif(session()->get('lang') == 'en')
-                                         Send Message
-                                      @else
-                                         Ирсол
-                                      @endif
-                                </button>
-                            </div>
-                        </div>
-                         </div>
-                    </form>
-            </div>
-            <div class="col-12 col-lg-5 col-xxl-4">
-                <div class="more-help wow fadeInUp" data-wow-duration="0.8s">
-                    <h4 class="contact__title wow fadeInUp" data-wow-duration="0.8s">
-                        @if(session()->get('lang') == 'ru')
-                           Нужна дополнительная помощь?
-                        @elseif(session()->get('lang') == 'en')
-                          Need more help?
-                        @else
-                           Кӯмаки бештар лозим аст?
-                        @endif
-
-
-                    </h4>
-                    <div class="more-help__content">
-                        <div class="card card--small">
-                            <div class="card--small-icon">
-                                <i class="bi bi-telephone"></i> 
-                            </div>
-                            <div class="card--small-content">
-                                <h5 class="card--small-title">
-                                      @if(session()->get('lang') == 'ru')
-                                           Позвонить сейчас
-                                        @elseif(session()->get('lang') == 'en')
-                                           Call Now
-                                        @else
-                                           Занг занед
-                                        @endif
-
-                               </h5>
-                                <div class="gap-1 flex-column">
-                                    <a href="tel:+{{ $siteSettings->phone }}" class="card--small-call">{{ $siteSettings->phone }}</a>
-                            
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card card--small">
-                            <div class="card--small-icon">
-                                <i class="bi bi-envelope-open"></i> 
-                            </div>
-                            <div class="card--small-content">
-                                <h5 class="card--small-title">Email </h5>
-                                <div class="gap-1 flex-column">
-                                    <a href="mailto:{{ $siteSettings->email }}" class="card--small-call">{{ $siteSettings->email }}</a>
-                          
-                                </div>
-                            </div>
-                        </div>
-                        <div class="card card--small">
-                            <div class="card--small-icon">
-                                <i class="bi bi-geo-alt"></i> 
-                            </div>
-                            <div class="card--small-content">
-                                <h5 class="card--small-title">
-                                    @if(session()->get('lang') == 'ru')
-                                           Местонахождение
-                                        @elseif(session()->get('lang') == 'en')
-                                           Location
-                                        @else
-                                           Макон
-                                        @endif
-                                </h5>
-                                <div class="gap-1 flex-column">
-                                    <p>
-                                         @if (session()->get('lang') == 'ru')
-                                            {{ $siteSettings->street_ru }} &nbsp;
-                                        @elseif(session()->get('lang') == 'en')
-                                            {{ $siteSettings->street_en }} &nbsp;
-                                        @else
-                                            {{ $siteSettings->street_tj }} &nbsp;
-                                        @endif
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+    {{-- Контактная информация --}}
+    <section class="py-16 px-6">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid md:grid-cols-3 gap-8 mb-16">
+                {{-- Телефон --}}
+                <div class="contact-card">
+                    <div class="contact-icon">
+                        <svg class="w-7 h-7" style="color: var(--gold);" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z" />
+                        </svg>
                     </div>
+                    <h3 class="display-font text-xl font-bold text-white mb-3">
+                        @if(session()->get('lang') == 'ru') Телефон @elseif(session()->get('lang') == 'en') Phone @else Телефон @endif
+                    </h3>
+                    <a href="tel:+{{ $siteSettings->phone }}" class="text-gray-400 hover:underline">{{ $siteSettings->phone }}</a>
+                </div>
+
+                {{-- Email --}}
+                <div class="contact-card">
+                    <div class="contact-icon">
+                        <svg class="w-7 h-7" style="color: var(--gold);" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                            <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                        </svg>
+                    </div>
+                    <h3 class="display-font text-xl font-bold text-white mb-3">Email</h3>
+                    <a href="mailto:{{ $siteSettings->email }}" class="text-gray-400 hover:underline">{{ $siteSettings->email }}</a>
+                </div>
+
+                {{-- Адрес --}}
+                <div class="contact-card">
+                    <div class="contact-icon">
+                        <svg class="w-7 h-7" style="color: var(--gold);" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M5.05 4.05a7 7 0 119.9 9.9L10 18.9l-4.95-4.95a7 7 0 010-9.9zM10 11a2 2 0 100-4 2 2 0 000 4z" clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <h3 class="display-font text-xl font-bold text-white mb-3">
+                        @if(session()->get('lang') == 'ru') Адрес @elseif(session()->get('lang') == 'en') Address @else Суроға @endif
+                    </h3>
+                    <p class="text-gray-400">
+                        @if(session()->get('lang') == 'ru') {{ $siteSettings->street_ru }}
+                        @elseif(session()->get('lang') == 'en') {{ $siteSettings->street_en }}
+                        @else {{ $siteSettings->street_tj }} @endif
+                    </p>
+                </div>
+            </div>
+
+            {{-- Форма --}}
+            <div class="max-w-3xl mx-auto">
+                <div class="text-center mb-10">
+                    <p class="text-sm uppercase tracking-widest mb-3" style="color: var(--gold);">@trans('contact_us')</p>
+                    <h2 class="section-title">
+                        @if(session()->get('lang') == 'ru') Напишите нам
+                        @elseif(session()->get('lang') == 'en') Write to us
+                        @else Ба мо нависед @endif
+                    </h2>
+                    <div class="gold-divider"></div>
+                </div>
+
+                <div style="background: var(--dark-card); border: 1px solid var(--dark-border); border-radius: 20px; padding: 40px; position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--gold), transparent);"></div>
+                    <form action="{{ route('contact_form_submit') }}" method="POST" class="form_subscribe_ajax">
+                        @csrf
+                        <div class="grid md:grid-cols-2 gap-6 mb-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-2">
+                                    @if(session()->get('lang') == 'ru') Имя @elseif(session()->get('lang') == 'en') Name @else Ном @endif
+                                </label>
+                                <input type="text" name="name" required class="form-input" placeholder="@if(session()->get('lang') == 'ru')Ваше имя@elseif(session()->get('lang') == 'en')Your name@else Номи шумо@endif">
+                                <span class="text-red-400 text-xs error-text name_error"></span>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-400 mb-2">Email</label>
+                                <input type="email" name="email" required class="form-input" placeholder="your@email.com">
+                                <span class="text-red-400 text-xs error-text email_error"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-6">
+                            <label class="block text-sm font-medium text-gray-400 mb-2">
+                                @if(session()->get('lang') == 'ru') Сообщение @elseif(session()->get('lang') == 'en') Message @else Паём @endif
+                            </label>
+                            <textarea name="message" required class="form-input" rows="5"
+                                placeholder="@if(session()->get('lang') == 'ru')Ваше сообщение...@elseif(session()->get('lang') == 'en')Your message...@else Паёми шумо...@endif"></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-primary w-full py-4 text-lg font-semibold">
+                            @if(session()->get('lang') == 'ru') Отправить @elseif(session()->get('lang') == 'en') Send @else Ирсол @endif
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>
-    </div>
-</section>
-<!-- contact end -->   
-
-
-    <!-- Blog End -->
-    <script>
-        (function($){
-            $(".form_contact_ajax").on('submit', function(e){
-                e.preventDefault();
-                $('#loader').show();
-                let form = this;
-                $.ajax({
-                    url:$(form).attr('action'),
-                    method:$(form).attr('method'),
-                    data:new FormData(form),
-                    processData:false,
-                    dataType:'json',
-                    contentType:false,
-                    beforeSend:function(){
-                        $(form).find('span.error-text').text('');
-                    },
-                    success:function(data)
-                    {
-                        $('#loader').hide();
-                        if(data.code == 0)
-                        {
-                            $.each(data.error_message, function(prefix, val) {
-                                $(form).find('span.'+prefix+'_error').text(val[0]);
-                            });
-                        }
-                        else if(data.code == 1)
-                        {
-                            $(form)[0].reset();
-                            iziToast.success({
-                                title: '',
-                                position: 'topRight',
-                                message: data.success_message,
-                            });
-                        }
-
-                    }
-                });
-            });
-        })(jQuery);
-    </script>
-    <div id="loader"></div>
+    </section>
 @endsection

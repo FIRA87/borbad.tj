@@ -1,60 +1,75 @@
-@if($news->count() > 0)
-    <div class="row g-4">
-        @foreach($news as $item)
-        <div class="col-12 col-md-4 news-card">
-            <article class="card border-0 shadow-sm h-100">
-                <div class="position-relative overflow-hidden" style="height: 240px;">
-                    @if(!empty($item->image) && $item->image !== 'no-image.jpg')
-                        <img src="{{ asset($item->image) }}" class="w-100 h-100 object-fit-cover news-image" alt="News">
+@if ($news->count() > 0)
+    <div class="grid md:grid-cols-3 gap-8">
+        @foreach ($news as $item)
+            <a href="{{ url('news/details/' . $item->id) }}" class="news-card block">
+                <div class="h-52 overflow-hidden">
+                    @if (!empty($item->image) && $item->image !== 'no-image.jpg')
+                        <img src="{{ asset($item->image) }}" class="w-full h-full object-cover" alt="News">
                     @else
-                        <div class="w-100 h-100 bg-secondary d-flex align-items-center justify-content-center">
-                            <i class="bi bi-image text-white" style="font-size: 4rem; opacity:0.3;"></i>
+                        <div class="w-full h-full flex items-center justify-center"
+                            style="background: var(--dark-surface);">
+                            <svg class="w-12 h-12 text-gray-700" fill="currentColor" viewBox="0 0 20 20">
+                                <path
+                                    d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" />
+                            </svg>
                         </div>
                     @endif
-                    <div class="position-absolute bottom-0 start-0 m-3">
-                        <span class="badge bg-white text-dark px-3 py-2 shadow-sm">
-                            <i class="bi bi-calendar3 me-1"></i>
+                </div>
+                <div class="p-5">
+                    <div class="flex items-center gap-2 mb-3">
+                        <span class="text-xs" style="color: var(--text-muted);">
                             {{ \Carbon\Carbon::parse($item->publish_date ?? $item->created_at)->format('d.m.Y') }}
                         </span>
                     </div>
-                </div>
-                <div class="card-body d-flex flex-column p-4">
-                    <h5 class="card-title fw-bold mb-3" style="min-height:60px; line-height:1.4;">
-                        <a href="{{ url('news/details/'.$item->id) }}" class="text-decoration-none text-dark stretched-link">
-                            @if(session()->get('lang')=='ru') {{ Str::limit($item->title_ru,70) }}
-                            @elseif(session()->get('lang')=='en') {{ Str::limit($item->title_en,70) }}
-                            @else {{ Str::limit($item->title_tj,70) }} @endif
-                        </a>
-                    </h5>
-                    <p class="card-text text-muted small mb-3 flex-grow-1">
-                        @if(session()->get('lang')=='ru') {{ Str::limit(strip_tags($item->news_details_ru ?? ''),100) }}
-                        @elseif(session()->get('lang')=='en') {{ Str::limit(strip_tags($item->news_details_en ?? ''),100) }}
-                        @else {{ Str::limit(strip_tags($item->news_details_tj ?? ''),100) }} @endif
+                    <h4 class="display-font text-lg font-bold text-white mb-2" style="line-height: 1.4;">
+                        @if (session()->get('lang') == 'ru')
+                            {{ Str::limit($item->title_ru, 70) }}
+                        @elseif(session()->get('lang') == 'en')
+                            {{ Str::limit($item->title_en, 70) }}
+                        @else
+                            {{ Str::limit($item->title_tj, 70) }}
+                        @endif
+                    </h4>
+                    <p class="text-sm mb-3" style="color: var(--text-secondary);">
+                        @if (session()->get('lang') == 'ru')
+                            {{ Str::limit(strip_tags($item->news_details_ru ?? ''), 100) }}
+                        @elseif(session()->get('lang') == 'en')
+                            {{ Str::limit(strip_tags($item->news_details_en ?? ''), 100) }}
+                        @else
+                            {{ Str::limit(strip_tags($item->news_details_tj ?? ''), 100) }}
+                        @endif
                     </p>
-                    <div class="mt-auto">
-                        <span class="text-primary fw-semibold small">
-                            @if(session()->get('lang')=='ru') Читать больше...
-                            @elseif(session()->get('lang')=='en') Read more...
-                            @else Бештар хондан... @endif
-                        </span>
-                    </div>
+                    <span class="text-sm font-medium" style="color: var(--gold);">
+                        @if (session()->get('lang') == 'ru')
+                            Читать далее
+                        @elseif(session()->get('lang') == 'en')
+                            Read more
+                        @else
+                            Бештар хондан
+                        @endif →
+                    </span>
                 </div>
-            </article>
-        </div>
+            </a>
         @endforeach
     </div>
 
-    {{-- Пагинация --}}
-    <div class="mt-4">
+    <div class="mt-10">
         {{ $news->links() }}
     </div>
 @else
-    <div class="text-center py-5">
-        <i class="bi bi-folder-x" style="font-size:4rem; color:#ccc;"></i>
-        <h4 class="mt-3 text-muted">
-            @if(session()->get('lang')=='ru') Новости не найдены
-            @elseif(session()->get('lang')=='en') No news found
-            @else Хабарҳо ёфт нашуданд @endif
-        </h4>
+    <div class="text-center py-16">
+        <svg class="w-16 h-16 mx-auto mb-4" style="color: var(--text-muted); opacity: 0.3;" fill="currentColor"
+            viewBox="0 0 20 20">
+            <path d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z" />
+        </svg>
+        <h3 class="display-font text-2xl font-bold text-white mb-2">
+            @if (session()->get('lang') == 'ru')
+                Новости не найдены
+            @elseif(session()->get('lang') == 'en')
+                No news found
+            @else
+                Хабарҳо ёфт нашуданд
+            @endif
+        </h3>
     </div>
 @endif

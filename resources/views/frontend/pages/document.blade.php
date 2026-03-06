@@ -1,321 +1,288 @@
 @extends('frontend.master')
 
 @section('title')
-   @trans('documents')
+    @trans('documents')
 @endsection
+
+@push('styles')
+    <style>
+        .filter-bar {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .filter-input {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--dark-bg);
+            border: 1px solid var(--dark-border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .filter-input:focus {
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px var(--gold-dim);
+        }
+
+        .filter-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        select.filter-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239B9590' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 36px;
+        }
+
+        .filter-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .filter-reset {
+            padding: 12px 24px;
+            background: transparent;
+            border: 1px solid var(--dark-border);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+
+        .filter-reset:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .doc-card {
+            background: var(--dark-card);
+            border: 1px solid var(--dark-border);
+            border-radius: 16px;
+            padding: 24px;
+            transition: all 0.4s ease;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .doc-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--gold);
+            box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .doc-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .doc-icon.pdf { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+        .doc-icon.doc { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+        .doc-icon.xls { background: rgba(34, 197, 94, 0.15); color: #22c55e; }
+        .doc-icon.ppt { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+        .doc-icon.zip { background: rgba(156, 163, 175, 0.15); color: #9ca3af; }
+        .doc-icon.other { background: var(--gold-dim); color: var(--gold); }
+
+        .doc-wrapper {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .doc-wrapper.hiding {
+            opacity: 0;
+            transform: scale(0.95);
+        }
+    </style>
+@endpush
 
 @section('content')
-
-
-<!-- Banner Start -->
-<section class="custom-banner">
-    <div class="container">
-        <div class="custom-banner-left">          
-            <h1 class="custom-banner-title text-left">@trans('documents')          </h1>
+    {{-- Заголовок --}}
+    <section class="pt-16 pb-12 px-6" style="background: var(--dark-surface); border-bottom: 1px solid var(--dark-border);">
+        <div class="max-w-7xl mx-auto text-center">
+            <p class="text-sm uppercase tracking-widest mb-3" style="color: var(--gold);">@trans('documents')</p>
+            <h1 class="display-font text-5xl md:text-6xl font-bold mb-4 text-white">@trans('documents')</h1>
+            <div class="gold-divider"></div>
         </div>
-    </div>
-</section>
-<!-- Banner End -->
+    </section>
 
-
-<div class="container py-5">
-
-    <!-- Фильтры -->
-    <div class="card shadow-sm border-0 mb-4">
-        <div class="card-body filter-panel">
-            <div class="row g-3 align-items-end">
-
-                <!-- Поиск -->
-                <div class="col-md-4">
-                    <label class="form-label fw-bold">
-                        @if(session('lang') == 'ru') 
-                            Поиск по документам
-                        @elseif(session('lang') == 'en') 
-                            Search documents
-                        @else 
-                            Ҷустуҷӯ дар ҳуҷҷатҳо
-                        @endif
-                    </label>
-                    <input type="text" id="searchInput" class="form-control form-control-lg" placeholder="@if(session('lang') == 'ru')Введите название документа...@elseif(session('lang') == 'en')Enter document title...@else Навиштани номи ҳуҷҷат...@endif">
-                </div>
-
-                <!-- Фильтр по типу файла -->
-                <div class="col-md-3">
-                    <label class="form-label fw-bold">
-                        @if(session('lang') == 'ru') Тип файла
-                        @elseif(session('lang') == 'en') File type
-                        @else Навъи файл
-                        @endif
-                    </label>
-                    <select id="typeFilter" class="form-select form-select-lg">
-                        <option value="all">
-                            @if(session('lang') == 'ru') Все
-                            @elseif(session('lang') == 'en') All
-                            @else Ҳама
-                            @endif
-                        </option>
-                        <option value="pdf">PDF</option>
-                        <option value="doc">DOC/DOCX</option>
-                        <option value="xls">XLS/XLSX</option>
-                        <option value="ppt">PPT/PPTX</option>
-                        <option value="zip">ZIP</option>
-                    </select>
-                </div>
-
-                <!-- Сортировка -->
-                <div class="col-md-3">
-                    <label class="form-label fw-bold">
-                        @if(session('lang') == 'ru') Сортировка
-                        @elseif(session('lang') == 'en') Sort
-                        @else Ҷобаҷо
-                        @endif
-                    </label>
-                    <select id="sortFilter" class="form-select form-select-lg">
-                        <option value="desc" selected>
-                            @if(session('lang') == 'ru') Новые → Старые
-                            @elseif(session('lang') == 'en') New → Old
-                            @else Нав → Куҳна
-                            @endif
-                        </option>
-                        <option value="asc">
-                            @if(session('lang') == 'ru') Старые → Новые
-                            @elseif(session('lang') == 'en') Old → New
-                            @else Куҳна → Нав
-                            @endif
-                        </option>
-                    </select>
-                </div>
-
-                <!-- Сброс -->
-                <div class="col-md-2 d-grid">
-                    <button type="button" class="btn btn-outline-secondary btn-lg" id="resetFilters">
-                        <i class="bi bi-arrow-clockwise me-1"></i>
-                        @if(session('lang') == 'ru') Сбросить
-                        @elseif(session('lang') == 'en') Reset
-                        @else Тоза кардан
-                        @endif
-                    </button>
-                </div>
-
-            </div>
-
-            <!-- Счетчик -->
-            <div class="mt-3">
-                <p class="text-muted mb-0" id="resultsCount">
-                    @if(session('lang') == 'ru') Показано: <strong>{{ $documents->count() }}</strong> из <strong>{{ $documents->total() }}</strong> документов
-                    @elseif(session('lang') == 'en') Showing: <strong>{{ $documents->count() }}</strong> of <strong>{{ $documents->total() }}</strong> documents
-                    @else Намоиш дода шудааст: <strong>{{ $documents->count() }}</strong> аз <strong>{{ $documents->total() }}</strong> ҳуҷҷат
-                    @endif
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Список документов -->
-    <div class="row g-4" id="documentsGrid">
-        @foreach($documents as $doc)
-        @php
-            $icons = [
-                'pdf' => 'bi-file-earmark-pdf text-danger',
-                'doc' => 'bi-file-earmark-word text-primary',
-                'docx'=> 'bi-file-earmark-word text-primary',
-                'xls' => 'bi-file-earmark-excel text-success',
-                'xlsx'=> 'bi-file-earmark-excel text-success',
-                'ppt' => 'bi-file-earmark-ppt text-warning',
-                'pptx'=> 'bi-file-earmark-ppt text-warning',
-                'zip' => 'bi-file-earmark-zip text-secondary',
-            ];
-            $ext = strtolower($doc->file_type);
-            $icon = $icons[$ext] ?? 'bi-file-earmark';
-        @endphp
-
-        <div class="col-lg-3 col-md-4 col-12 document-card"
-             data-title-ru="{{ strtolower($doc->title_ru ?? '') }}"
-             data-title-en="{{ strtolower($doc->title_en ?? '') }}"
-             data-title-tj="{{ strtolower($doc->title_tj ?? '') }}"
-             data-desc-ru="{{ strtolower(strip_tags($doc->description_ru ?? '')) }}"
-             data-desc-en="{{ strtolower(strip_tags($doc->description_en ?? '')) }}"
-             data-desc-tj="{{ strtolower(strip_tags($doc->description_tj ?? '')) }}"
-             data-type="{{ $ext }}"
-             data-date="{{ $doc->published_at }}">
-            <div class="card shadow-sm border-0 h-100 rounded-4">
-                <div class="card-body d-flex flex-column">
-                    <div class="mb-3">
-                        <i class="bi {{ $icon }}" style="font-size: 2rem;"></i>
+    <section class="py-16 px-6">
+        <div class="max-w-7xl mx-auto">
+            {{-- Фильтры --}}
+            <div class="filter-bar mb-10">
+                <div class="grid md:grid-cols-4 gap-4 items-end">
+                    <div>
+                        <label class="filter-label">
+                            @if(session('lang') == 'ru') Поиск @elseif(session('lang') == 'en') Search @else Ҷустуҷӯ @endif
+                        </label>
+                        <input type="text" id="searchInput" class="filter-input"
+                            placeholder="@if(session('lang') == 'ru')Введите название...@elseif(session('lang') == 'en')Enter title...@else Номро ворид кунед...@endif">
                     </div>
-                    <h6 class="fw-bold mb-2">
-                        @if(session('lang') == 'ru') {{ $doc->title_ru }}
-                        @elseif(session('lang') == 'en') {{ $doc->title_en }}
-                        @else {{ $doc->title_tj }}
-                        @endif
-                    </h6>
-                    <span class="text-muted small mb-3">
-                        {{ \Carbon\Carbon::parse($doc->published_at)->format('d.m.Y') }}
-                    </span>
-                    <p class="flex-grow-1 text-muted">
-                        @if(session('lang') == 'ru') {{ Str::limit($doc->description_ru, 120) }}
-                        @elseif(session('lang') == 'en') {{ Str::limit($doc->description_en, 120) }}
-                        @else {{ Str::limit($doc->description_tj, 120) }}
-                        @endif
-                    </p>
-                    <span class="badge bg-secondary mb-3">
-                        {{ strtoupper($doc->file_type) }}
-                    </span>
-                    <a href="{{ route('frontend.documents.download', $doc->id) }}" class="btn btn-outline-success mt-auto">
-                        <i class="bi bi-download me-1"></i>
-                        Скачать
-                    </a>
+                    <div>
+                        <label class="filter-label">
+                            @if(session('lang') == 'ru') Тип файла @elseif(session('lang') == 'en') File type @else Навъи файл @endif
+                        </label>
+                        <select id="typeFilter" class="filter-input">
+                            <option value="all">@if(session('lang') == 'ru') Все @elseif(session('lang') == 'en') All @else Ҳама @endif</option>
+                            <option value="pdf">PDF</option>
+                            <option value="doc">DOC/DOCX</option>
+                            <option value="xls">XLS/XLSX</option>
+                            <option value="ppt">PPT/PPTX</option>
+                            <option value="zip">ZIP</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="filter-label">
+                            @if(session('lang') == 'ru') Сортировка @elseif(session('lang') == 'en') Sort @else Ҷобаҷо @endif
+                        </label>
+                        <select id="sortFilter" class="filter-input">
+                            <option value="desc">@if(session('lang') == 'ru') Новые → Старые @elseif(session('lang') == 'en') New → Old @else Нав → Куҳна @endif</option>
+                            <option value="asc">@if(session('lang') == 'ru') Старые → Новые @elseif(session('lang') == 'en') Old → New @else Куҳна → Нав @endif</option>
+                        </select>
+                    </div>
+                    <div class="flex items-end">
+                        <button type="button" class="filter-reset w-full" id="resetFilters">
+                            @if(session('lang') == 'ru') Сбросить @elseif(session('lang') == 'en') Reset @else Тоза кардан @endif
+                        </button>
+                    </div>
                 </div>
+                <p class="text-sm mt-3" style="color: var(--text-muted);" id="resultsCount"></p>
+            </div>
+
+            {{-- Документы --}}
+            <div class="grid md:grid-cols-4 gap-6" id="documentsGrid">
+                @foreach($documents as $doc)
+                    @php
+                        $ext = strtolower($doc->file_type);
+                        $iconClass = match(true) {
+                            $ext === 'pdf' => 'pdf',
+                            in_array($ext, ['doc', 'docx']) => 'doc',
+                            in_array($ext, ['xls', 'xlsx']) => 'xls',
+                            in_array($ext, ['ppt', 'pptx']) => 'ppt',
+                            $ext === 'zip' => 'zip',
+                            default => 'other'
+                        };
+                    @endphp
+                    <div class="doc-wrapper"
+                        data-title-ru="{{ strtolower($doc->title_ru ?? '') }}"
+                        data-title-en="{{ strtolower($doc->title_en ?? '') }}"
+                        data-title-tj="{{ strtolower($doc->title_tj ?? '') }}"
+                        data-type="{{ $ext }}"
+                        data-date="{{ $doc->published_at }}">
+                        <div class="doc-card">
+                            <div class="doc-icon {{ $iconClass }}">{{ strtoupper($ext) }}</div>
+                            <h5 class="text-white font-bold mb-2 text-sm">
+                                @if(session('lang') == 'ru') {{ $doc->title_ru }}
+                                @elseif(session('lang') == 'en') {{ $doc->title_en }}
+                                @else {{ $doc->title_tj }} @endif
+                            </h5>
+                            <p class="text-xs mb-2" style="color: var(--text-muted);">
+                                {{ \Carbon\Carbon::parse($doc->published_at)->format('d.m.Y') }}
+                            </p>
+                            <p class="text-sm mb-4 flex-1" style="color: var(--text-secondary);">
+                                @if(session('lang') == 'ru') {{ Str::limit($doc->description_ru, 100) }}
+                                @elseif(session('lang') == 'en') {{ Str::limit($doc->description_en, 100) }}
+                                @else {{ Str::limit($doc->description_tj, 100) }} @endif
+                            </p>
+                            <a href="{{ route('frontend.documents.download', $doc->id) }}" class="btn-outline text-sm py-2 px-4 text-center">
+                                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                                @if(session('lang') == 'ru') Скачать @elseif(session('lang') == 'en') Download @else Боргирӣ @endif
+                            </a>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+
+            <div id="noResults" class="text-center py-16" style="display: none;">
+                <h3 class="display-font text-2xl font-bold text-white mb-2">
+                    @if(session('lang') == 'ru') Документы не найдены
+                    @elseif(session('lang') == 'en') No documents found
+                    @else Ҳуҷҷатҳо ёфт нашуданд @endif
+                </h3>
+            </div>
+
+            <div class="mt-10" id="paginationContainer">
+                {{ $documents->links() }}
             </div>
         </div>
-        @endforeach
-    </div>
-
-    <!-- Сообщение "Ничего не найдено" -->
-    <div id="noResults" class="text-center py-5" style="display: none;">
-        <i class="bi bi-folder-x" style="font-size: 4rem; color: #ccc;"></i>
-        <h4 class="mt-3 text-muted">
-            @if(session('lang') == 'ru') Документы не найдены
-            @elseif(session('lang') == 'en') No documents found
-            @else Ҳуҷҷатҳо ёфт нашуданд
-            @endif
-        </h4>
-        <p class="text-muted">
-            @if(session('lang') == 'ru') Попробуйте изменить параметры поиска или фильтрации
-            @elseif(session('lang') == 'en') Try changing your search or filter parameters
-            @else Параметрҳои ҷустуҷӯ ё филтрро тағйир диҳед
-            @endif
-        </p>
-    </div>
-
-    <!-- Пагинация -->
-    <div class="mt-4 d-flex justify-content-center" id="paginationContainer">
-        {{ $documents->links() }}
-    </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    const typeFilter = document.getElementById('typeFilter');
-    const sortFilter = document.getElementById('sortFilter');
-    const resetButton = document.getElementById('resetFilters');
-    const documentCards = document.querySelectorAll('.document-card');
-    const resultsCount = document.getElementById('resultsCount');
-    const noResults = document.getElementById('noResults');
-    const documentsGrid = document.getElementById('documentsGrid');
-    const paginationContainer = document.getElementById('paginationContainer');
-
-    function filterDocuments() {
-        const searchTerm = searchInput.value.toLowerCase().trim();
-        const typeValue = typeFilter.value;
-        const sortValue = sortFilter.value;
-        let visibleCards = [];
-
-        documentCards.forEach(card => {
-            const titleRu = card.getAttribute('data-title-ru') || '';
-            const titleEn = card.getAttribute('data-title-en') || '';
-            const titleTj = card.getAttribute('data-title-tj') || '';
-            const descRu = card.getAttribute('data-desc-ru') || '';
-            const descEn = card.getAttribute('data-desc-en') || '';
-            const descTj = card.getAttribute('data-desc-tj') || '';
-            const type = card.getAttribute('data-type');
-
-            const matchesSearch = !searchTerm || 
-                                  titleRu.includes(searchTerm) || 
-                                  titleEn.includes(searchTerm) || 
-                                  titleTj.includes(searchTerm) ||
-                                  descRu.includes(searchTerm) ||
-                                  descEn.includes(searchTerm) ||
-                                  descTj.includes(searchTerm);
-
-            const matchesType = typeValue === 'all' || type === typeValue;
-
-            if (matchesSearch && matchesType) {
-                card.classList.remove('hiding');
-                card.style.display = 'block';
-                setTimeout(() => {
-                    card.style.opacity = '1';
-                    card.style.transform = 'scale(1)';
-                }, 10);
-                visibleCards.push(card);
-            } else {
-                card.classList.add('hiding');
-                setTimeout(() => {
-                    if (card.classList.contains('hiding')) {
-                        card.style.display = 'none';
-                    }
-                }, 300);
-            }
-        });
-
-        // Сортировка по дате
-        visibleCards.sort((a, b) => {
-            const dateA = new Date(a.getAttribute('data-date'));
-            const dateB = new Date(b.getAttribute('data-date'));
-            return sortValue === 'asc' ? dateA - dateB : dateB - dateA;
-        });
-
-        visibleCards.forEach(card => documentsGrid.appendChild(card));
-
-        updateResultsCount(visibleCards.length);
-
-        noResults.style.display = visibleCards.length === 0 ? 'block' : 'none';
-        paginationContainer.style.display = visibleCards.length === 0 ? 'none' : 'flex';
-    }
-
-    function updateResultsCount(count) {
-        const lang = '{{ session()->get("lang") ?? "tj" }}';
-        const total = documentCards.length;
-        let text = '';
-        if (lang === 'ru') {
-            text = `Показано: <strong>${count}</strong> из <strong>${total}</strong> документов`;
-        } else if (lang === 'en') {
-            text = `Showing: <strong>${count}</strong> of <strong>${total}</strong> documents`;
-        } else {
-            text = `Намоиш дода шудааст: <strong>${count}</strong> аз <strong>${total}</strong> ҳуҷҷат`;
-        }
-        resultsCount.innerHTML = text;
-    }
-
-    let searchTimeout;
-    searchInput.addEventListener('input', function() {
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(filterDocuments, 300);
-    });
-
-    typeFilter.addEventListener('change', filterDocuments);
-    sortFilter.addEventListener('change', filterDocuments);
-
-    resetButton.addEventListener('click', function() {
-        searchInput.value = '';
-        typeFilter.value = 'all';
-        sortFilter.value = 'desc';
-        filterDocuments();
-        resetButton.innerHTML = '<i class="bi bi-check me-1"></i>{{ session()->get("lang") == "ru" ? "Сброшено" : (session()->get("lang") == "en" ? "Reset" : "Тоза карда шуд") }}';
-        setTimeout(() => {
-            resetButton.innerHTML = '<i class="bi bi-arrow-clockwise me-1"></i>{{ session()->get("lang") == "ru" ? "Сбросить" : (session()->get("lang") == "en" ? "Reset" : "Тоза кардан") }}';
-        }, 2000);
-    });
-
-    filterDocuments();
-});
-</script>
-
-<style>
-.document-card {
-    transition: opacity 0.3s ease, transform 0.3s ease;
-}
-.document-card.hiding {
-    opacity: 0;
-    transform: scale(0.95);
-}
-.filter-panel {
-    background: #f8f9fa;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-</style>
-
+    </section>
 @endsection
+
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.getElementById('searchInput');
+            const typeFilter = document.getElementById('typeFilter');
+            const sortFilter = document.getElementById('sortFilter');
+            const resetButton = document.getElementById('resetFilters');
+            const cards = document.querySelectorAll('.doc-wrapper');
+            const noResults = document.getElementById('noResults');
+            const grid = document.getElementById('documentsGrid');
+
+            function filterDocuments() {
+                const term = searchInput.value.toLowerCase().trim();
+                const type = typeFilter.value;
+                let visible = [];
+
+                cards.forEach(card => {
+                    const matchesSearch = !term ||
+                        (card.dataset.titleRu || '').includes(term) ||
+                        (card.dataset.titleEn || '').includes(term) ||
+                        (card.dataset.titleTj || '').includes(term);
+                    const matchesType = type === 'all' || card.dataset.type === type;
+
+                    if (matchesSearch && matchesType) {
+                        card.classList.remove('hiding');
+                        card.style.display = '';
+                        visible.push(card);
+                    } else {
+                        card.classList.add('hiding');
+                        setTimeout(() => { if (card.classList.contains('hiding')) card.style.display = 'none'; }, 300);
+                    }
+                });
+
+                // Сортировка
+                visible.sort((a, b) => {
+                    const dA = new Date(a.dataset.date), dB = new Date(b.dataset.date);
+                    return sortFilter.value === 'asc' ? dA - dB : dB - dA;
+                });
+                visible.forEach(c => grid.appendChild(c));
+                noResults.style.display = visible.length === 0 ? 'block' : 'none';
+            }
+
+            let timeout;
+            searchInput.addEventListener('input', () => { clearTimeout(timeout); timeout = setTimeout(filterDocuments, 300); });
+            typeFilter.addEventListener('change', filterDocuments);
+            sortFilter.addEventListener('change', filterDocuments);
+            resetButton.addEventListener('click', () => {
+                searchInput.value = '';
+                typeFilter.value = 'all';
+                sortFilter.value = 'desc';
+                filterDocuments();
+            });
+
+            filterDocuments();
+        });
+    </script>
+@endpush

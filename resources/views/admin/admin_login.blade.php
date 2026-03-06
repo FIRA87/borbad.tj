@@ -2,21 +2,31 @@
 <html lang="ru">
 
 <head>
-    <meta charset="utf-8" />
-    <title>Авторизация</title>
+    <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta content="Admin Panel Login" name="description" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Вход в панель администратора — Борбад</title>
+    <meta name="description" content="Авторизация в панели администратора">
     <link rel="shortcut icon" href="{{ asset('backend/assets/images/favicon.ico') }}">
 
-    <!-- Bootstrap css -->
-    <link href="{{ asset('backend/assets/css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
-    <!-- App css -->
-    <link href="{{ asset('backend/assets/css/app.min.css') }}" rel="stylesheet" type="text/css" id="app-style" />
-    <!-- icons -->
-    <link href="{{ asset('backend/assets/css/icons.min.css') }}" rel="stylesheet" type="text/css" />
-    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+
     <style>
+        :root {
+            --bg: #0F0E0C;
+            --surface: #181614;
+            --card: #1F1D1A;
+            --border: #2D2A25;
+            --gold: #D4A843;
+            --gold-light: #E8CC7A;
+            --gold-dim: rgba(212, 168, 67, 0.15);
+            --text: #F0EDE8;
+            --text-muted: #9B9590;
+            --error: #e07c7c;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -24,362 +34,328 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Inter', sans-serif;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            position: relative;
-            overflow: hidden;
+            background: var(--bg);
+            color: var(--text);
+            padding: 24px;
         }
 
         body::before {
             content: '';
-            position: absolute;
-            width: 200%;
-            height: 200%;
-            background: 
-                radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%);
-            animation: float 20s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            33% { transform: translate(30px, -30px) rotate(120deg); }
-            66% { transform: translate(-20px, 20px) rotate(240deg); }
-        }
-
-        .login-container {
-            position: relative;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent 5%, var(--gold) 50%, transparent 95%);
+            opacity: 0.7;
             z-index: 1;
+        }
+
+        .login-wrap {
+            position: relative;
             width: 100%;
-            max-width: 440px;
-            padding: 20px;
+            max-width: 420px;
         }
 
         .login-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            box-shadow: 
-                0 20px 60px rgba(0, 0, 0, 0.3),
-                0 0 0 1px rgba(255, 255, 255, 0.1) inset;
-            padding: 50px 40px;
-            animation: slideUp 0.6s ease-out;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 48px 40px;
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.4);
         }
 
-        @keyframes slideUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .logo-section {
+        .login-header {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 32px;
         }
 
-        .logo-section img {
-            height: 80px;
-            margin-bottom: 20px;
-            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.1));
-            transition: transform 0.3s ease;
+        .login-logo {
+            display: block;
+            margin: 0 auto 20px;
+            height: 64px;
+            width: auto;
+            object-fit: contain;
         }
 
-        .logo-section img:hover {
-            transform: scale(1.05);
-        }
-
-        .welcome-text {
-            font-size: 28px;
+        .login-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
             font-weight: 700;
-            color: #2d3748;
-            margin-bottom: 8px;
-            letter-spacing: -0.5px;
+            color: var(--text);
+            margin-bottom: 6px;
         }
 
-        .subtitle-text {
-            color: #718096;
-            font-size: 15px;
-            line-height: 1.6;
+        .login-subtitle {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .gold-line {
+            width: 48px;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+            margin: 16px auto 0;
         }
 
         .form-group {
-            margin-bottom: 24px;
+            margin-bottom: 20px;
         }
 
         .form-label {
             display: block;
-            font-weight: 600;
-            color: #4a5568;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--text-muted);
             margin-bottom: 8px;
-            font-size: 14px;
-            letter-spacing: 0.3px;
         }
 
-        .form-control {
+        .form-input {
             width: 100%;
-            padding: 14px 18px;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 15px;
-            transition: all 0.3s ease;
-            background: #f7fafc;
+            padding: 12px 16px;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text);
+            font-size: 1rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
-        .form-control:focus {
+        .form-input::placeholder {
+            color: var(--text-muted);
+            opacity: 0.8;
+        }
+
+        .form-input:focus {
             outline: none;
-            border-color: #667eea;
-            background: #fff;
-            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
-            transform: translateY(-1px);
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px var(--gold-dim);
         }
 
-        .form-control.is-invalid {
-            border-color: #fc8181;
+        .form-input.is-invalid {
+            border-color: var(--error);
         }
 
-        .form-control.is-invalid:focus {
-            box-shadow: 0 0 0 4px rgba(252, 129, 129, 0.1);
-        }
-
-        .input-group {
+        .input-wrap {
             position: relative;
         }
 
-        .input-group-text {
+        .input-wrap .form-input {
+            padding-right: 44px;
+        }
+
+        .btn-toggle-password {
             position: absolute;
-            right: 14px;
+            right: 12px;
             top: 50%;
             transform: translateY(-50%);
-            cursor: pointer;
-            color: #a0aec0;
-            transition: color 0.2s ease;
             background: none;
             border: none;
-            padding: 0;
-            z-index: 10;
+            padding: 4px;
+            cursor: pointer;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .input-group-text:hover {
-            color: #667eea;
+        .btn-toggle-password:hover {
+            color: var(--gold);
         }
 
-        .password-eye {
-            display: block;
+        .btn-toggle-password svg {
             width: 20px;
             height: 20px;
         }
 
-        .text-danger {
-            color: #fc8181;
-            font-size: 13px;
+        .form-error {
+            font-size: 0.8125rem;
+            color: var(--error);
             margin-top: 6px;
-            display: block;
         }
 
-        .remember-section {
+        .remember-row {
             display: flex;
             align-items: center;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
 
         .form-check {
             display: flex;
             align-items: center;
+            cursor: pointer;
         }
 
         .form-check-input {
             width: 18px;
             height: 18px;
-            border: 2px solid #cbd5e0;
-            border-radius: 4px;
-            cursor: pointer;
             margin-right: 10px;
-        }
-
-        .form-check-input:checked {
-            background-color: #667eea;
-            border-color: #667eea;
+            accent-color: var(--gold);
+            cursor: pointer;
         }
 
         .form-check-label {
-            color: #4a5568;
-            font-size: 14px;
+            font-size: 0.875rem;
+            color: var(--text-muted);
             cursor: pointer;
             user-select: none;
         }
 
         .btn-login {
             width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--gold) 0%, #BF9A38 100%);
+            color: var(--bg);
             border: none;
-            border-radius: 12px;
-            font-size: 16px;
+            border-radius: 10px;
+            font-size: 1rem;
             font-weight: 600;
+            font-family: inherit;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-            letter-spacing: 0.5px;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .btn-login:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.6);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px rgba(212, 168, 67, 0.25);
         }
 
         .btn-login:active {
             transform: translateY(0);
         }
 
-        .footer {
+        .back-link {
+            display: block;
             text-align: center;
-            margin-top: 30px;
-            color: rgba(255, 255, 255, 0.9);
-            font-size: 14px;
-            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-top: 24px;
+            font-size: 0.875rem;
         }
 
-        @media (max-width: 576px) {
+        .back-link a {
+            color: var(--gold);
+            text-decoration: none;
+        }
+
+        .back-link a:hover {
+            text-decoration: underline;
+            color: var(--gold-light);
+        }
+
+        @media (max-width: 480px) {
             .login-card {
-                padding: 40px 30px;
+                padding: 32px 24px;
             }
 
-            .welcome-text {
-                font-size: 24px;
-            }
-
-            .logo-section img {
-                height: 60px;
-            }
-        }
-
-        /* Floating particles effect */
-        .particle {
-            position: absolute;
-            background: rgba(255, 255, 255, 0.5);
-            border-radius: 50%;
-            pointer-events: none;
-        }
-
-        .particle:nth-child(1) {
-            width: 80px;
-            height: 80px;
-            top: 10%;
-            left: 10%;
-            animation: float-particle 15s infinite;
-        }
-
-        .particle:nth-child(2) {
-            width: 60px;
-            height: 60px;
-            top: 70%;
-            left: 80%;
-            animation: float-particle 12s infinite reverse;
-        }
-
-        .particle:nth-child(3) {
-            width: 100px;
-            height: 100px;
-            top: 40%;
-            left: 5%;
-            animation: float-particle 18s infinite;
-        }
-
-        @keyframes float-particle {
-            0%, 100% {
-                transform: translate(0, 0);
-                opacity: 0.3;
-            }
-            50% {
-                transform: translate(50px, 50px);
-                opacity: 0.6;
+            .login-title {
+                font-size: 1.25rem;
             }
         }
     </style>
 </head>
 
 <body>
-    <div class="particle"></div>
-    <div class="particle"></div>
-    <div class="particle"></div>
-
-    <div class="login-container">
+    <div class="login-wrap">
         <div class="login-card">
-            <div class="logo-section">
-                <img src="{{ asset('frontend/img/logo.png') }}" alt="Logo">
-                <h1 class="welcome-text">Добро пожаловать!</h1>
-                <p class="subtitle-text">Введите данные для входа в панель администратора</p>
+            <div class="login-header">
+                <img src="{{ asset('frontend/gerb.png') }}" alt="Борбад" class="login-logo">
+                <h1 class="login-title">Панель администратора</h1>
+                <p class="login-subtitle">Введите данные для входа</p>
+                <div class="gold-line"></div>
             </div>
+
+            @if(session('error'))
+                <div class="form-group" style="margin-bottom: 16px;">
+                    <p class="form-error">{{ session('error') }}</p>
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="form-group" style="margin-bottom: 16px;">
+                    @foreach($errors->all() as $err)
+                        <p class="form-error">{{ $err }}</p>
+                    @endforeach
+                </div>
+            @endif
 
             <form method="POST" action="{{ route('login') }}">
                 @csrf
 
                 <div class="form-group">
-                    <label for="email" class="form-label">E-mail адрес</label>
-                    <input 
-                        class="form-control @error('email') is-invalid @enderror" 
-                        type="email"
-                        id="email" 
-                        name="email" 
-                        required 
-                        placeholder="example@domain.com"
-                        value="{{ old('email') }}"
-                    >
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email"
+                           id="email"
+                           name="email"
+                           class="form-input @error('email') is-invalid @enderror"
+                           value="{{ old('email') }}"
+                           placeholder="admin@example.com"
+                           autocomplete="email"
+                           required
+                           autofocus>
                     @error('email')
-                        <span class="text-danger">{{ $message }}</span>
+                        <span class="form-error">{{ $message }}</span>
                     @enderror
                 </div>
 
                 <div class="form-group">
                     <label for="password" class="form-label">Пароль</label>
-                    <div class="input-group">
-                        <input 
-                            type="password" 
-                            id="password" 
-                            name="password"
-                            class="form-control @error('password') is-invalid @enderror"
-                            placeholder="Введите ваш пароль"
-                            required
-                        >
-                        <div class="input-group-text" data-password="false">
-                            <span class="password-eye"></span>
-                        </div>
+                    <div class="input-wrap">
+                        <input type="password"
+                               id="password"
+                               name="password"
+                               class="form-input @error('password') is-invalid @enderror"
+                               placeholder="••••••••"
+                               autocomplete="current-password"
+                               required>
+                        <button type="button" class="btn-toggle-password" aria-label="Показать пароль" title="Показать пароль">
+                            <svg class="eye-open" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                            </svg>
+                            <svg class="eye-closed" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="display: none;">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                            </svg>
+                        </button>
                     </div>
                     @error('password')
-                        <span class="text-danger">{{ $message }}</span>
+                        <span class="form-error">{{ $message }}</span>
                     @enderror
                 </div>
 
-                <div class="remember-section">
-                    <div class="form-check">
-                        <input type="checkbox" class="form-check-input" id="checkbox-signin" checked>
-                        <label class="form-check-label" for="checkbox-signin">Запомнить меня</label>
-                    </div>
+                <div class="remember-row">
+                    <label class="form-check">
+                        <input type="checkbox" name="remember" class="form-check-input" id="remember" {{ old('remember') ? 'checked' : '' }}>
+                        <span class="form-check-label" for="remember">Запомнить меня</span>
+                    </label>
                 </div>
 
-                <button class="btn-login" type="submit">
-                    Войти в систему
-                </button>
+                <button type="submit" class="btn-login">Войти</button>
             </form>
-        </div>
 
-    
+            <a href="{{ url('/') }}" class="back-link">← На главную</a>
+        </div>
     </div>
 
-    <!-- Vendor js -->
-    <script src="{{ asset('backend/assets/js/vendor.min.js') }}"></script>
-    <!-- App js -->
-    <script src="{{ asset('backend/assets/js/app.min.js') }}"></script>
+    <script>
+        (function() {
+            var btn = document.querySelector('.btn-toggle-password');
+            var input = document.getElementById('password');
+            var eyeOpen = btn.querySelector('.eye-open');
+            var eyeClosed = btn.querySelector('.eye-closed');
+            if (!btn || !input) return;
+            btn.addEventListener('click', function() {
+                var isPass = input.type === 'password';
+                input.type = isPass ? 'text' : 'password';
+                eyeOpen.style.display = isPass ? 'none' : 'block';
+                eyeClosed.style.display = isPass ? 'block' : 'none';
+                btn.setAttribute('aria-label', isPass ? 'Скрыть пароль' : 'Показать пароль');
+            });
+        })();
+    </script>
 </body>
 
 </html>

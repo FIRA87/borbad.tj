@@ -8,9 +8,14 @@ return new class extends Migration
 {
     /**
      * Run the migrations.
+     * Пропускаем создание, если таблица уже существует.
      */
     public function up(): void
     {
+        if (Schema::hasTable('static_translations')) {
+            return;
+        }
+
         Schema::create('static_translations', function (Blueprint $table) {
             $table->id();
             $table->string('key')->unique(); // например: 'show_all_responsibilities'

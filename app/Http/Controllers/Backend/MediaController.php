@@ -12,14 +12,38 @@ class MediaController extends Controller
 {
     protected string $basePath = 'upload/media'; // public/upload/media
 
+    /**
+     * Нормализация относительного пути и проверка, что он не выходит за basePath (path traversal).
+     */
+    private function resolvePath(string $relativePath): string
+    {
+        $relativePath = trim(str_replace('\\', '/', $relativePath), '/');
+        $parts = array_filter(explode('/', $relativePath));
+        $stack = [];
+        foreach ($parts as $p) {
+            if ($p === '..') {
+                if (empty($stack)) {
+                    abort(422, 'Недопустимый путь');
+                }
+                array_pop($stack);
+                continue;
+            }
+            if ($p !== '.') {
+                $stack[] = $p;
+            }
+        }
+        $safeRelative = implode('/', $stack);
+        return public_path($this->basePath . ($safeRelative !== '' ? '/' . $safeRelative : ''));
+    }
+
     public function index(Request $request)
     {
         $path = trim($request->get('path', ''), '/');
         $sort = $request->get('sort', 'name');
 
-        $fullPath = public_path($this->basePath . ($path ? '/' . $path : ''));
+        $fullPath = $this->resolvePath($path);
 
-        if (! File::exists($fullPath)) {
+        if (!File::exists($fullPath)) {
             File::makeDirectory($fullPath, 0755, true);
         }
 
@@ -67,9 +91,11 @@ class MediaController extends Controller
     public function upload(Request $request)
     {
         $path = trim($request->get('path', ''), '/');
-        $uploadPath = public_path($this->basePath . ($path ? '/' . $path : ''));
+        $uploadPath = $this->resolvePath($path);
 
-        if (! File::exists($uploadPath)) File::makeDirectory($uploadPath, 0755, true);
+        if (!File::exists($uploadPath)) {
+            File::makeDirectory($uploadPath, 0755, true);
+        }
 
         if ($request->hasFile('file')) {
             $file = $request->file('file');
@@ -100,9 +126,9 @@ class MediaController extends Controller
         }
 
         $folderName = Str::slug($folderName, '-');
-        $fullPath = public_path($this->basePath . ($path ? '/' . $path : '') . '/' . $folderName);
+        $fullPath = $this->resolvePath($path) . '/' . $folderName;
 
-        if (! File::exists($fullPath)) {
+        if (!File::exists($fullPath)) {
             File::makeDirectory($fullPath, 0755, true);
             return response()->json(['success'=>true,'message'=>'Папка создана']);
         }
@@ -117,7 +143,14 @@ class MediaController extends Controller
             return response()->json(['success'=>false,'message'=>'Путь не указан'], 422);
         }
 
-        $fullPath = public_path($this->basePath . '/' . $target);
+        $fullPath = $this->resolvePath($target);
+        $baseReal = realpath(public_path($this->basePath));
+        if ($baseReal !== false) {
+            $resolved = realpath($fullPath);
+            if ($resolved !== false && !str_starts_with($resolved, $baseReal)) {
+                return response()->json(['success'=>false,'message'=>'Недопустимый путь'], 422);
+            }
+        }
 
         Log::info('Media delete requested: ' . $fullPath);
 
@@ -147,7 +180,18 @@ class MediaController extends Controller
             return response()->json(['success'=>false,'message'=>'Параметры не указаны'], 422);
         }
 
-        $oldFull = public_path($this->basePath . '/' . $old);
+        if (str_contains($newName, '..') || str_contains($newName, '/')) {
+            return response()->json(['success'=>false,'message'=>'Недопустимое имя'], 422);
+        }
+
+        $oldFull = $this->resolvePath($old);
+        $baseReal = realpath(public_path($this->basePath));
+        if ($baseReal !== false) {
+            $resolved = realpath($oldFull);
+            if ($resolved !== false && !str_starts_with($resolved, $baseReal)) {
+                return response()->json(['success'=>false,'message'=>'Недопустимый путь'], 422);
+            }
+        }
         $dir = dirname($oldFull);
         $newFull = $dir . '/' . $newName;
 
