@@ -8,10 +8,8 @@ use App\Models\Gallery;
 use App\Models\News;
 use App\Models\Page;
 use App\Models\Link;
-use App\Models\Subcategory;
 use App\Models\User;
 use App\Models\Video;
-use App\Models\Survey;
 use App\Models\President;
 use App\Models\Leader;
 use App\Models\Document;
@@ -114,7 +112,9 @@ class IndexController extends Controller
 	 */
 	public function afishaPage()
 	{
-		$news = News::where('status', 1)->where('category_id', 3)
+		$news = News::with('category')
+			->where('status', 1)
+			->where('category_id', 3)
 			->orderByDesc('publish_date')
 			->paginate(10);
 
@@ -151,7 +151,9 @@ class IndexController extends Controller
 	 */
 	public function eventsPage()
 	{
-		$news = News::where('status', 1)->where('category_id', self::EVENTS_CATEGORY_ID)
+		$news = News::with('category')
+			->where('status', 1)
+			->where('category_id', self::EVENTS_CATEGORY_ID)
 			->orderByDesc('publish_date')
 			->paginate(12);
 
@@ -205,9 +207,6 @@ class IndexController extends Controller
 	 */
 	public function index()
 	{
-		$now = now();
-
-		// Вспомогательная функция для безопасного выполнения запросов
 		$safeQuery = function ($callback, $default = null) {
 			try {
 				return $callback();
@@ -219,37 +218,26 @@ class IndexController extends Controller
 			}
 		};
 
-
+		$linksData = $safeQuery(fn() => Link::where('status', 1)->orderBy('sort')->limit(4)->get());
+		$homePageNews = $safeQuery(fn() => News::with('images')->published()->where('home_page', 1)->orderByDesc('publish_date')->limit(1)->get());
 
 		$data = [
-			'news' => $safeQuery(fn() =>News::with('images')->published()->where('category_id',  3 )->orderByDesc('publish_date')->get()),
-			'sliders' => $safeQuery(fn() =>News::published()->where('top_slider', 1)->orderByDesc('publish_date')->limit(5)->get()),
-			'home_page' => $safeQuery(fn() =>News::with('images')->published()->where('home_page', 1)->limit(1)->get()),
-			'home_page2' => $safeQuery(fn() =>
-				News::with([
-					'tasks' => fn($query) => $query
-						->where('status', 1)
-						->orderBy('sort')
-						->with(['items' => fn($q) => $q->orderBy('sort')])
-				])
-				->published()
-				->where('home_page', 1)
-				->whereHas('tasks.items')
-				->orderByDesc('publish_date')
-				->first()
-			),
+			'news' => $safeQuery(fn() => News::with('images')->published()->where('category_id', 3)->orderByDesc('publish_date')->get()),
+			'sliders' => $safeQuery(fn() => News::published()->where('top_slider', 1)->orderByDesc('publish_date')->limit(5)->get()),
+			'home_page' => $homePageNews,
+			'home_page2' => $homePageNews->first(),
 
 			'galleries' => $safeQuery(fn() => Gallery::limit(3)->get()),
-			'videos' => $safeQuery(fn() =>Video::where('status', 1)->orderByDesc('id')->limit(4)->get()),
-			'links' => $safeQuery(fn() =>Link::where('status', 1)->orderBy('sort')->limit(4)->get()),
-			'prezident' => $safeQuery(fn() =>President::where('status', 1)->limit(1)->get()),
-			'leaders' => $safeQuery(fn() =>Leader::where('status', 1)->limit(4)->get()),
-			'partners' => $safeQuery(fn() =>Link::where('status', 1)->orderBy('sort')->limit(4)->get()),
+			'videos' => $safeQuery(fn() => Video::where('status', 1)->orderByDesc('id')->limit(4)->get()),
+			'links' => $linksData,
+			'partners' => $linksData,
+			'prezident' => $safeQuery(fn() => President::where('status', 1)->limit(1)->get()),
+			'leaders' => $safeQuery(fn() => Leader::where('status', 1)->limit(4)->get()),
 			'about' => $safeQuery(fn() => About::getContent()),
 		];
 
-    return view('frontend.index', $data);
-    }
+		return view('frontend.index', $data);
+	}
 
 
 
