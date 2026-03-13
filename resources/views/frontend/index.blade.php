@@ -67,7 +67,7 @@
         }
 
         .hero-slide-caption h2 {
-            font-family: var(--font-display, Georgia, serif);
+            font-family: 'Roboto', sans-serif;
             font-size: clamp(1.75rem, 4vw, 2.75rem);
             font-weight: 700;
             color: #fff;
@@ -249,7 +249,7 @@
             font-size: 3.5rem;
             color: var(--gold);
             opacity: 0.2;
-            font-family: 'Playfair Display', serif;
+            font-family: 'Roboto', sans-serif;
             line-height: 1;
         }
 

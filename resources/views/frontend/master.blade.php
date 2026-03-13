@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=Cormorant+Garamond:wght@300;400;500;600;700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700&display=swap"
         rel="stylesheet">
     {{-- Toastr CSS --}}
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/toastr@2.1.4/build/toastr.min.css">
@@ -74,7 +74,7 @@
         }
 
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Roboto', sans-serif;
             background: var(--dark-bg);
             color: var(--text-primary);
             overflow-x: hidden;
@@ -96,11 +96,11 @@
         }
 
         .display-font {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Roboto', sans-serif;
         }
 
         .body-font {
-            font-family: 'Cormorant Garamond', serif;
+            font-family: 'Roboto', sans-serif;
         }
 
         /* Кастомный скроллбар */
@@ -582,7 +582,7 @@
 
         /* ===== Section headings ===== */
         .section-title {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Roboto', sans-serif;
             font-size: 2.8rem;
             font-weight: 700;
             color: var(--text-primary);
@@ -733,6 +733,21 @@
             background: linear-gradient(135deg, #FAFAF8 0%, #F0EDE8 50%, #FAFAF8 100%);
         }
 
+        /* Светлая тема: белый текст на светлом фоне — заменяем на читаемый */
+        [data-theme="light"] .text-white {
+            color: var(--text-primary) !important;
+        }
+
+        /* Исключение: hero с тёмным оверлеем — текст остаётся белым */
+        [data-theme="light"] .hero-slide-caption,
+        [data-theme="light"] .hero-slide-caption * {
+            color: #fff !important;
+        }
+
+        [data-theme="light"] #searchClose:hover {
+            color: var(--text-primary) !important;
+        }
+
         /* ===== Responsiveness ===== */
         @media (max-width: 768px) {
             .section-title {
@@ -748,11 +763,11 @@
     {{-- Стили отдельных страниц --}}
     @stack('styles')
 
-    {{-- Мгновенное применение сохранённой темы (до рендера — без мерцания) --}}
+    {{-- Мгновенное применение сохранённой темы (до рендера — без мерцания). По умолчанию — светлая тема. --}}
     <script>
         (function() {
             var theme = localStorage.getItem('borbad_theme');
-            if (theme === 'light') {
+            if (theme !== 'dark') {
                 document.documentElement.setAttribute('data-theme', 'light');
             }
         })();

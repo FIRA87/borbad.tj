@@ -40,7 +40,7 @@
         }
 
         .cont_error > h1  {
-            font-family: 'Lato', sans-serif;
+            font-family: 'Roboto', sans-serif;
             font-weight: 400;
             font-size:150px;
             color:#fff;
@@ -51,7 +51,7 @@
 
 
         .cont_error > p  {
-            font-family: 'Lato', sans-serif;
+            font-family: 'Roboto', sans-serif;
             font-weight: 300;
             font-size:24px;
             letter-spacing: 5px;

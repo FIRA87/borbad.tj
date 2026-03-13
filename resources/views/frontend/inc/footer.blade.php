@@ -34,11 +34,11 @@
                             <svg class="w-10 h-10" viewBox="0 0 40 40" fill="none">
                                 <circle cx="20" cy="20" r="18" stroke="var(--gold)" stroke-width="2" />
                                 <text x="50%" y="55%" text-anchor="middle" dominant-baseline="middle" fill="var(--gold)"
-                                    font-family="'Playfair Display', serif" font-size="18" font-weight="700">К</text>
+                                    font-family="'Roboto', sans-serif" font-size="18" font-weight="700">К</text>
                             </svg>
                         </div>
                         <div>
-                            <span class="display-font text-xl font-bold text-white tracking-wider">
+                            <span class="display-font text-xl font-bold tracking-wider" style="color: var(--text-primary);">
                                 @if (session('lang') == 'ru')
                                     Кохи Борбад
                                 @elseif(session('lang') == 'en')
@@ -120,7 +120,7 @@
                             @foreach ($pages as $p)
                                 <li>
                                     <a href="{{ route('menu.show', $p->id) }}"
-                                        class="text-gray-400 hover:text-white transition text-sm flex items-center gap-2">
+                                        class="text-gray-400 hover:opacity-80 transition text-sm flex items-center gap-2" style="color: var(--text-secondary);">
                                         <span class="w-1 h-1 rounded-full" style="background: var(--gold);"></span>
                                         @if (session('lang') == 'ru')
                                             {{ $p->title_ru }}
@@ -148,7 +148,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                             </svg>
-                            <span class="text-gray-400 text-sm">{!! nl2br(e($footerAddress)) !!}</span>
+                            <span class="text-sm" style="color: var(--text-secondary);">{!! nl2br(e($footerAddress)) !!}</span>
                         </li>
                         <li class="flex items-start gap-3">
                             <svg class="w-5 h-5 mt-0.5 flex-shrink-0" style="color: var(--gold);" fill="none"
@@ -157,7 +157,7 @@
                                     d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                             </svg>
                             <a href="tel:{{ preg_replace('/\s+/', '', $footerPhone) }}"
-                                class="text-gray-400 text-sm hover:text-white transition">{{ $footerPhone }}</a>
+                                class="text-sm transition hover:opacity-80" style="color: var(--text-secondary);">{{ $footerPhone }}</a>
                         </li>
                         <li class="flex items-start gap-3">
                             <svg class="w-5 h-5 mt-0.5 flex-shrink-0" style="color: var(--gold);" fill="none"
@@ -166,7 +166,7 @@
                                     d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                             </svg>
                             <a href="mailto:{{ $footerEmail }}"
-                                class="text-gray-400 text-sm hover:text-white transition">{{ $footerEmail }}</a>
+                                class="text-sm transition hover:opacity-80" style="color: var(--text-secondary);">{{ $footerEmail }}</a>
                         </li>
                     </ul>
                 </div>
@@ -177,11 +177,11 @@
                     <ul class="space-y-3">
                         <li class="flex items-center justify-between text-sm">
                             <span class="text-gray-400">@trans('footer_weekdays')</span>
-                            <span class="text-white font-medium">{{ $footerHoursWeekdays }}</span>
+                            <span class="font-medium" style="color: var(--text-primary);">{{ $footerHoursWeekdays }}</span>
                         </li>
                         <li class="flex items-center justify-between text-sm">
                             <span class="text-gray-400">@trans('footer_weekend')</span>
-                            <span class="text-white font-medium">{{ $footerHoursWeekend }}</span>
+                            <span class="font-medium" style="color: var(--text-primary);">{{ $footerHoursWeekend }}</span>
                         </li>
                     </ul>
 

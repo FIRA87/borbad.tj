@@ -93,7 +93,7 @@
             font-size: 1.5rem;
             font-weight: 700;
             color: var(--gold);
-            font-family: 'Playfair Display', serif;
+            font-family: 'Roboto', sans-serif;
         }
 
         .event-date-badge .month {
@@ -127,7 +127,7 @@
         }
 
         .event-card-title {
-            font-family: 'Playfair Display', serif;
+            font-family: 'Roboto', sans-serif;
             font-size: 1.1rem;
             font-weight: 700;
             color: #fff;

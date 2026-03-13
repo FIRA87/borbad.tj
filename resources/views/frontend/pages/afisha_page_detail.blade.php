@@ -30,7 +30,7 @@
             color: var(--text-primary);
             margin-top: 2rem;
             margin-bottom: 1rem;
-            font-family: 'Playfair Display', serif;
+            font-family: 'Roboto', sans-serif;
         }
 
         .gallery-carousel {

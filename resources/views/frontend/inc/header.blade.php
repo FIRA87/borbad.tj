@@ -101,7 +101,7 @@
                         <svg class="w-10 h-10" viewBox="0 0 40 40" fill="none">
                             <circle cx="20" cy="20" r="18" stroke="var(--gold)" stroke-width="2" />
                             <text x="50%" y="55%" text-anchor="middle" dominant-baseline="middle" fill="var(--gold)"
-                                font-family="'Playfair Display', serif" font-size="18" font-weight="700">К</text>
+                                font-family="'Roboto', sans-serif" font-size="18" font-weight="700">К</text>
                         </svg>
                     </div>
                     <div>
